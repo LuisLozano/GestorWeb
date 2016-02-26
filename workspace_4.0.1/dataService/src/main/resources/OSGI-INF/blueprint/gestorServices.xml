@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+    xmlns:jpa="http://aries.apache.org/xmlns/jpan/v1.0.0"
+    xmlns:tx="http://aries.apache.org/xmlns/transactions/v1.2.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    >
+    	   
+	<jpa:enable/>			
+	<service ref="dataService"
+		interface="es.salazaryasociados.db.service.IDataService" />
+						
+	<bean id="dataService" class="es.salazaryasociados.db.service.DataService">
+		<property name="fileDao" ref="fileDao"/>
+		<property name="clientDao" ref="clientDao"/>
+		<property name="responsableDao" ref="responsableDao"/>
+		<property name="userDao" ref="userDao"/>
+		<property name="pagoDao" ref="pagoDao"/>
+		<property name="documentoDao" ref="documentDao"/>
+		<property name="configuracionDao" ref="configuracionDao"/>
+		<tx:transaction method="*" value="Required" />
+	</bean>
+	    	   
+	<bean id="clientDao"
+		class="es.salazaryasociados.db.control.ClientDao">
+	</bean>
+			
+	<bean id="fileDao"
+		class="es.salazaryasociados.db.control.ExpedienteDao">
+	</bean>
+	
+	<bean id="responsableDao"
+		class="es.salazaryasociados.db.control.ResponsableDao">
+	</bean>
+
+	<bean id="userDao" class="es.salazaryasociados.db.control.UserDao">
+	</bean>
+
+	<bean id="pagoDao" class="es.salazaryasociados.db.control.PagoDao">
+	</bean>
+	
+	<bean id="configuracionDao" class="es.salazaryasociados.db.control.ConfiguracionDao">
+	</bean>	
+	
+	<bean id="documentDao" class="es.salazaryasociados.db.control.DocumentoDao">
+	</bean>	
+				
+</blueprint>

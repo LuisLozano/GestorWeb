@@ -1,0 +1,59 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/WEB-INF/facelets/templates/defaultLayout.xhtml">
+	<ui:define name="title">
+		<h:outputText value="Administración" />
+	</ui:define>
+	<ui:define name="content">
+	
+	<h:form id="form">
+		<p:growl id="growl" showDetail="true" sticky="true" autoUpdate="true" />
+		<p:accordionPanel id="panel">
+	        <p:tab id="users" title="Usuarios">
+	        	<h:panelGrid columns="2">
+	        		<h:panelGrid columns="1">	        			
+						<p:dataTable id="usersTab" style="text-align: left; width:250px;" var="user" value="#{adminBean.allUsers}" selectionMode="single" selection="#{adminBean.selectedUser}" rowKey="#{user.id}" scrollable="true" scrollHeight="185">
+							<p:ajax event="rowSelect" listener="#{adminBean.onUserSelect}" update=":form:panel:userData" />
+	        				<p:ajax event="rowUnselect" listener="#{adminBean.onUserUnselect}" update=":form:panel:userData" />					
+						    <p:column headerText="Usuarios">
+						    	<h:outputText value="#{user.username}" />
+						    </p:column>
+					    </p:dataTable>			
+					    		    
+					    <h:panelGrid columns="2">
+					    	<p:commandButton value="Nuevo" actionListener="#{adminBean.newUser}" ajax="true" update=":form:panel:userData :form:panel:usersTab"/>
+					    	<p:commandButton id="deleteUser" value="Eliminar"/>
+					    </h:panelGrid>
+					    
+				    </h:panelGrid>
+				    <p:panel header="#{adminBean.username}" id="userData">      					    	
+					    <h:panelGrid columns="2">				    
+				            <h:panelGrid columns="2" cellpadding="5">
+				            	<h:outputLabel for="username" value="Nombre:" />
+				            	<p:inputText id="username" value="#{adminBean.username}" label="username"/>
+				            	<h:outputLabel for="password" value="Password:" />
+				            	<p:password id="password" value="#{adminBean.password}" label="password" />
+				            	<h:outputLabel for="password2" value="Confirmar Password:" />
+				            	<p:password id="password2" value="#{adminBean.password2}" label="password" />
+				            	<p:commandButton value="Guardar" ajax="false" actionListener="#{adminBean.createUser}" update=":form:growl :form:panel:usersTab :form:panel:userData"/>				            	            					                	            
+				            </h:panelGrid>
+				            <p:pickList id="pickList" value="#{adminBean.roles}" var="role" itemLabel="#{role}" itemValue="#{role}" />				            
+						</h:panelGrid>		            						
+					</p:panel>
+	            </h:panelGrid>	            
+	        </p:tab>
+	        <p:tab title="Base de datos">
+	            <h:panelGrid columns="2" cellpadding="10">
+	                <p:graphicImage name="demo/images/godfather/godfather2.jpg" />
+	                <h:outputText value="Francis Ford Coppola's legendary..." />
+	            </h:panelGrid>
+	        </p:tab>
+    	</p:accordionPanel>
+	</h:form>
+		
+	</ui:define>
+</ui:composition>
+</html>

@@ -1,0 +1,189 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/WEB-INF/facelets/templates/defaultLayout.xhtml">
+	<ui:define name="title">
+		<h:outputText value="Expedientes" />
+	</ui:define>
+	
+	<ui:define name="menu">
+		<ui:include src="/WEB-INF/facelets/templates/blockedMenu.xhtml" />
+	</ui:define>
+	
+	<ui:define name="content">
+		<h:form id="theForm">
+				
+			<p:growl id="msgs" showDetail="true" />
+		 
+			<p:panel id="mainPanel" header="Expediente: #{expedienteDetail.theFile.id}" style="margin-bottom:20px">
+				<h:panelGrid columns="2" cellpadding="10">
+					<h:outputText value="Asunto"/> <p:inputText value="#{expedienteDetail.theFile.asunto}" style="width:620px;text-align: left"/>
+				</h:panelGrid>
+				<h:panelGrid columns="2" cellpadding="10">
+					<h:panelGrid columns="2" cellpadding="10">
+						<h:outputText value="Responsable 1"/>
+							<p:selectOneMenu style="width:100px;text-align: left" value="#{expedienteDetail.responsable1}" required="true">								
+								<f:selectItems value="#{expedientesBean.responsables}" var="resp" itemLabel="#{resp.nombre}" itemValue="#{resp.id}" />
+							</p:selectOneMenu>
+					</h:panelGrid>
+					<h:panelGrid columns="2" cellpadding="10">
+						<h:outputText value="Responsable 2"/>
+							<p:selectOneMenu style="width:100px;text-align: left" value="#{expedienteDetail.responsable2}">
+								<f:selectItem itemLabel="--" itemValue="-1" />
+								<f:selectItems value="#{expedientesBean.responsables}" var="resp" itemLabel="#{resp.nombre}" itemValue="#{resp.id}" />
+							</p:selectOneMenu>
+					</h:panelGrid>														
+				</h:panelGrid>
+				<p:panel id="clientes" header="Clientes " style="margin-bottom:10px;margin-top:1px">
+					<h:panelGrid columns="2" cellpadding="10">
+						<p:dataTable var="cliente" widgetVar="clientesTable" id="clientesTable" value="#{expedienteDetail.theFile.clientes}" scrollable="true" scrollHeight="70">
+							<p:column style="width:32px;text-align: center">
+								<p:commandButton action="#{expedienteDetail.deleteClient(cliente.id)}" update=":theForm:clientes :theForm:dlgPagos" icon="ui-icon-trash"/>
+							</p:column>																	
+							<p:column headerText="Nombre" style="text-align: left; width:400px;">
+								<h:outputText value="#{cliente.nombre} #{cliente.apellidos}" />
+							</p:column>												
+							<p:column headerText="Teléfono" style="text-align: left; width:90px;">
+								<h:outputText value="#{cliente.telefono}" />
+							</p:column>							
+							<p:column headerText="Teléfono 2" style="text-align: left; width:90px;">
+								<h:outputText value="#{cliente.telefono2}" />
+							</p:column>													
+							<p:column headerText="Correo electrónico" style="text-align: left;">
+								<h:outputText value="#{cliente.correoElectronico}" />
+							</p:column>																	
+						</p:dataTable>						
+						<p:commandButton ajax="true" value="Añadir" oncomplete="PF('dlgClientes').show()" update="display clientesTable msgs"/>
+					</h:panelGrid>
+					<h:outputText value="Total: #{expedienteDetail.theFile.clientes.size()}"/>
+				</p:panel>
+				
+				<p:panel id="pagos" header="Datos económicos" style="margin-bottom:10px;margin-top:1px">
+					<h:panelGrid columns="2" cellpadding="10">
+						<p:dataTable var="pago" widgetVar="pagosTable" id="pagosTable" value="#{expedienteDetail.pagos}" scrollable="true" scrollHeight="100" >
+							<p:column style="width:32px;text-align: center">
+								<p:commandButton action="#{expedienteDetail.deletePago(pago.id)}" update=":theForm:pagos" icon="ui-icon-trash"/>
+							</p:column>
+
+							<p:column headerText="Fecha" style="text-align: left; width:100px;">
+								<h:outputText value="#{pago.fecha}">
+									<f:convertDateTime pattern="dd MMM yyyy" />
+								</h:outputText>
+							</p:column>												
+							<p:column headerText="Pagador" style="text-align: left; width:400px;">
+								<h:outputText value="#{pago.pagador}" />
+							</p:column>		
+							<p:column headerText="Cantidad" style="text-align: left; width:60px;">
+								<h:outputText value="#{pago.cantidad}" >
+									<f:convertNumber pattern="#,##0.00 ¤" currencySymbol="€" />
+								</h:outputText>
+							</p:column>													
+							<p:column headerText="Observaciones" style="text-align: left;">
+								<h:outputText value="#{pago.observaciones}" />
+							</p:column>																	
+						</p:dataTable>
+						<p:commandButton ajax="true" value="Añadir" oncomplete="PF('dlgPagos').show()" update="display pagos msgs"/>
+					</h:panelGrid>
+					<h:panelGrid id="summary" columns="2" cellpadding="2">
+						<h:outputText value="Presupuesto"/>
+						<h:panelGrid id="presupuesto" columns="3" cellpadding="2">
+							<h:outputText value="#{expedienteDetail.theFile.presupuesto}" >						
+								<f:convertNumber pattern="#,##0.00 ¤" currencySymbol="€" />
+							</h:outputText>				
+							<p:inputText value="#{expedienteDetail.theFile.presupuesto}">	
+							<f:convertNumber pattern="#,##0.00 ¤" currencySymbol="€" />
+							</p:inputText>
+							<p:commandButton update="summary" value="Cambiar" actionListener="#{expedienteDetail.changePresupuesto}"/>
+						</h:panelGrid>
+						<h:outputText value="Pagado"/>
+						<h:outputText value="#{expedienteDetail.pagado}" style="float:left">
+							<f:convertNumber pattern="#,##0.00 ¤" currencySymbol="€" />
+						</h:outputText>
+						<h:outputText value="Moroso"/>
+						<h:outputText value="#{expedienteDetail.moroso}" >
+							<f:convertNumber pattern="#,##0.00 ¤" currencySymbol="€" />
+						</h:outputText>						
+					</h:panelGrid>					
+					
+				</p:panel>		
+				<h:panelGrid columns="2" cellpadding="2">
+				<h:outputText value="Observaciones"/>
+				<p:inputTextarea rows="4" cols="150" value="#{expedienteDetail.theFile.observaciones}"/>
+				</h:panelGrid>
+				
+				<h:panelGrid columns="3" cellpadding="2">
+					<p:commandButton action="#{expedienteDetail.save()}" ajax="true" value="Guardar" update="msgs mainPanel"/>
+					<p:spacer width="1000" height="10" />
+					<p:commandButton oncomplete="PF('dlgExit').show()" ajax="true" value="Salir"/>
+				</h:panelGrid>
+			</p:panel>
+			
+			<p:dialog header="Clientes" modal="true" showEffect="clip" widgetVar="dlgClientes" resizable="false"  width="1000" height="500">
+				<p:panelGrid columns="2" id="display">
+				    <p:dataTable var="cliente" widgetVar="allClientesTable" id="allClientesTable" value="#{expedienteDetail.clientesModel}" rows="20"
+				                         paginator="true" paginatorPosition="both"
+				                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				                         rowsPerPageTemplate="20,50,70"
+				                         emptyMessage="No hay clientes que cumplan el filtro"
+				                         lazy="true"
+				                         style="table-layout: fixed"
+				                         sortBy="#{cliente.apellidos}"
+				                         sortOrder="ASCENDING"
+				                         >
+
+						<p:column style="width:32px;text-align: center">
+							<p:commandButton action="#{expedienteDetail.addClient(cliente.id)}" update=":theForm:clientes :theForm:dlgPagos" icon="ui-icon-plus"/>
+						</p:column>											
+				        <p:column headerText="Id" sortBy="#{cliente.id}" filterBy="#{cliente.id}" filterMatchMode="exact" 
+				        	style="text-align: left; width:50px;"
+				        	filterStyle="width:95%;">
+				            <h:outputText value="#{cliente.id}" />
+				        </p:column>
+				 
+				        <p:column headerText="Apellidos" sortBy="#{cliente.apellidos}" filterBy="#{cliente.apellidos}" filterMatchMode="contains" 
+				        	style="text-align: left; width:150px;"
+				        	filterStyle="width:95%;">
+				            <h:outputText value="#{cliente.apellidos}" />
+				        </p:column>
+				        
+				        <p:column headerText="Nombre" sortBy="#{cliente.nombre}" filterBy="#{cliente.nombre}" filterMatchMode="contains" 
+				        	style="text-align: left; width:150px;"
+				        	filterStyle="width:95%;">
+				            <h:outputText value="#{cliente.nombre}" />
+				        </p:column>	
+				        
+				        <p:column headerText="Observaciones" sortBy="#{cliente.observaciones}" filterBy="#{cliente.observaciones}"
+				        	style="text-align: left;"
+				        	filterStyle="width:95%;">
+				            <h:outputText value="#{cliente.observaciones}" />
+				        </p:column>	        	        
+				    </p:dataTable>
+				</p:panelGrid>
+    		</p:dialog>			
+			
+			<p:dialog header="Pago" modal="true" showEffect="clip" widgetVar="dlgPagos" resizable="false"  width="500" height="150" id="dlgPagos">
+				<p:panelGrid columns="2" id="displayPagos" columnClasses="label,value">
+						<h:outputText value="Cantidad"/> 
+						<p:inputText id="cantidad" value="#{expedienteDetail.newPago.cantidad}" style="width:80px;text-align: left">
+							<f:convertNumber pattern="#,##0.00 ¤" currencySymbol="€" />
+						</p:inputText>
+						<h:outputText value="Pagador"/>
+						<p:selectOneMenu style="width:250px;text-align: left" value="#{expedienteDetail.pagadorID}" >								
+							<f:selectItems value="#{expedienteDetail.theFile.clientes}" var="cliente" itemLabel="#{cliente.apellidos}, #{cliente.nombre}" itemValue="#{cliente.id}" />
+						</p:selectOneMenu>
+				</p:panelGrid>
+				<p:commandButton action="#{expedienteDetail.addPago()}" update=":theForm:pagos msgs" value="Añadir"/>
+			</p:dialog>
+			
+			<p:dialog header="Salir" modal="true" widgetVar="dlgExit" resizable="false"  id="dlgExit">
+				<h:panelGrid columns="1">
+					<p:outputLabel value="Perderá los cambios que no haya guardado"/>
+					<p:commandButton action="expedientes?faces-redirect=true" value="Aceptar"/>
+				</h:panelGrid>
+			</p:dialog>
+		</h:form>	
+	</ui:define>
+</ui:composition>
+</html>

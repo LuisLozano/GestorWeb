@@ -1,0 +1,83 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/WEB-INF/facelets/templates/defaultLayout.xhtml">
+	<ui:define name="title">
+		<h:outputText value="Responsables" />
+	</ui:define>
+	
+	<ui:define name="content">
+		<h:form id="theForm">
+				
+			<p:growl id="msgs" showDetail="true" />
+			<h:panelGrid columns="2" cellpadding="5"  styleClass="panelGrid" style="border:none;margin:0 auto;width:1000px;">
+				<p:dataTable var="responsable" widgetVar="responsablesTable" id="responsablesTable" value="#{responsablesBean.responsables}"
+									 emptyMessage="No hay responsables que cumplan el filtro"
+									 style="table-layout: fixed"
+									 selectionMode="single" selection="#{responsablesBean.selectedResponsable}" rowKey="#{responsable.id}"
+									 >
+					<f:facet name="header">
+							Lista de responsables
+					</f:facet>
+
+					<p:column headerText="Nombre" style="text-align: left; width:150px;">
+						<h:outputText value="#{responsable.nombre}"/>
+					</p:column>
+				</p:dataTable>	
+				
+				<p:tabView id="files">
+					<p:tab title="Informes" id="informesTab">
+						<p:selectManyCheckbox id="basic" >
+							<f:selectItem itemLabel="Incluir cerrados" itemValue="Incluir cerrados" />
+							<f:selectItem itemLabel="Incluir si aparece como segundo responsable" itemValue="Segundo responsable" />
+							<p:commandButton process=":theForm:responsablesTable" update=":theForm:carDetail :theForm:files:file" icon="ui-icon-search" value="View"/>
+						</p:selectManyCheckbox>						
+						<p:dataTable var="file"
+								id="file"
+								value="#{responsablesBean.filesDataModel}"
+								emptyMessage="No hay registros ¿Ha seleccionado un responsable?"
+								scrollRows="20"
+								liveScroll="true"
+								scrollHeight="500"
+								lazy="true"
+								scrollable="true">
+
+								<p:column headerText="ID">
+								   <h:outputText value="#{file.id}" />
+								</p:column>
+								<p:column headerText="Apellidos">
+								   <h:outputText value="#{file.surname}" />
+								</p:column>
+								<p:column headerText="Nombre">
+								   <h:outputText value="#{file.name}" />
+								</p:column>
+								<p:column headerText="Asunto" filterMatchMode="exact">
+								   <h:outputText value="#{file.subject}" />
+								</p:column>								
+								<p:column headerText="Teléfono">
+								   <h:outputText value="#{file.phone}" />
+								</p:column>
+								<p:column headerText="Pago">
+								   <h:outputText value="#{file.payment}" />
+								</p:column>
+								<p:column headerText="Cerrado">
+								   <h:outputText value="#{file.closed}" />
+								</p:column>								
+						</p:dataTable>						
+					</p:tab>
+					<p:tab title="Graficos">
+						<h:graphicImage value="resources/salazar_logo.jpg" />
+					</p:tab>
+				</p:tabView>
+				
+			</h:panelGrid>
+			
+			<p:outputPanel id="carDetail" style="text-align:center;">
+				<h:outputText value="#{responsablesBean.selectedResponsable.id}" />
+			</p:outputPanel>
+		</h:form>
+	</ui:define>
+</ui:composition>
+</html>

@@ -1,0 +1,162 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/WEB-INF/facelets/templates/defaultLayout.xhtml">
+	<ui:define name="title">
+		<h:outputText value="Clientes" />
+	</ui:define>
+	
+	<ui:define name="content">
+		<h:form id="theForm">
+				
+			<p:growl id="msgs" showDetail="true" />
+		 
+			<p:dataTable var="cliente" widgetVar="clientesTable" id="clientesTable" value="#{clientesBean.clientesModel}" rows="20"
+		                         paginator="true" paginatorPosition="bottom"
+		                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+		                         rowsPerPageTemplate="20,50,70"
+		                         emptyMessage="No hay clientes que cumplan el filtro"
+		                         lazy="true"
+		                         style="table-layout: fixed"
+		                         sortBy="#{cliente.apellidos}"
+		                         sortOrder="ASCENDING"
+		                         >
+		        <f:facet name="header">
+						Lista de clientes
+						<p:commandButton actionListener="#{clientesBean.newCliente}" oncomplete="PF('clienteDlg').show();" ajax="true" icon="ui-icon-plus"/>
+	    		</f:facet>
+				
+				<p:column style="width:32px;text-align: center">
+ 					<p:commandButton oncomplete="PF('clienteDlg').show();" update=":dialogForm:clienteDlg"  icon="ui-icon-search">
+                		<f:setPropertyActionListener value="#{cliente.id}" target="#{clientesBean.selectedClientID}" />
+            		</p:commandButton>
+				</p:column>
+				
+				<p:column style="width:32px;text-align: center">
+ 					<p:commandButton oncomplete="PF('deleteDlg').show();" update=":deleteDialog"  icon="ui-icon-trash">
+                		<f:setPropertyActionListener value="#{cliente.id}" target="#{clientesBean.selectedClientID}" />
+            		</p:commandButton>
+				</p:column>				
+				
+				<p:column headerText="Nombre" style="text-align: left; width:150px;" filterBy="#{cliente.nombre}" filterMatchMode="exact" filterStyle="width:95%;">
+					<h:outputText value="#{cliente.nombre}"/>
+				</p:column>												
+				<p:column headerText="Apellidos" style="text-align: left; width:300px;"  filterBy="#{cliente.apellidos}" filterMatchMode="exact" filterStyle="width:95%;">
+					<h:outputText value="#{cliente.apellidos}" />
+				</p:column>																
+				<p:column headerText="Teléfono" style="text-align: left; width:90px;">
+					<h:outputText value="#{cliente.telefono}" />
+				</p:column>							
+				<p:column headerText="Teléfono 2" style="text-align: left; width:90px;">
+					<h:outputText value="#{cliente.telefono2}" />
+				</p:column>													
+				<p:column headerText="Dirección" style="text-align: left;">
+					<h:outputText value="#{cliente.direccion}" />
+				</p:column>												
+				<p:column headerText="Población" style="text-align: left;">
+					<h:outputText value="#{cliente.poblacion}" />
+				</p:column>																
+				<p:column headerText="Correo electrónico" style="text-align: left;">
+					<h:outputText value="#{cliente.correoElectronico}" />
+				</p:column>																	
+			</p:dataTable>	
+
+			<p:blockUI block="clientesTable" trigger="clientesTable">
+				LOADING<br />
+				<p:graphicImage name="ajax-loader.gif"/>
+			</p:blockUI>			
+		</h:form>	
+		
+		<p:confirmDialog widgetVar="deleteDlg" id="deleteDialog"
+			header="Eliminar" message="¿Eliminar el cliente #{clientesBean.selectedClient.nombre} #{clientesBean.selectedClient.apellidos}?" width="400"
+			showEffect="clip" modal="true" closable="false" severity="alert">
+			<h:panelGroup layout="block" style="text-align: right">
+				<p:commandButton value="Yes" action="#{clientesBean.deleteCliente}"
+					oncomplete="PF('deleteDlg').hide();" update=":theForm:msgs :theForm:clientesTable" />
+				<p:commandButton value="No"
+					oncomplete="PF('deleteDlg').hide();" />
+			</h:panelGroup>
+		</p:confirmDialog>
+	
+		<h:form id="dialogForm">
+	
+			<p:dialog header="Cliente: #{clientesBean.selectedClient.id}" modal="true" showEffect="clip" widgetVar="clienteDlg" resizable="false" id="clienteDlg" width="800" closable="false">
+				<h:outputText value="Nombre y Apellidos" style="font-weight:bold"/>
+				<h:panelGrid columns="2" cellpadding="10">
+					<p:inputText value="#{clientesBean.selectedClient.nombre}" style="width:150px;text-align: left"/>
+					<p:inputText value="#{clientesBean.selectedClient.apellidos}" style="width:300px;text-align: left"/>
+				</h:panelGrid>					
+				<h:outputText value="Contacto" style="font-weight:bold"/>
+				<h:panelGrid columns="3" cellpadding="10">
+					<h:outputText value="Teléfono"/>
+						<p:inputText value="#{clientesBean.selectedClient.telefono}" style="width:90px;text-align: left"/>
+						<p:inputText value="#{clientesBean.selectedClient.telefono2}" style="width:90px;text-align: left"/>
+				</h:panelGrid>				
+				<h:panelGrid columns="2" cellpadding="10">
+					<h:outputText value="Correo electrónico"/>
+					<p:inputText value="#{clientesBean.selectedClient.correoElectronico}" style="width:300px;text-align: left"/>				
+				</h:panelGrid>
+				<h:panelGrid columns="1" cellpadding="5">
+					<h:outputText value="Dirección" style="font-weight:bold"/>
+					<p:inputTextarea rows="2" cols="75" value="#{clientesBean.selectedClient.direccion}"/>
+				</h:panelGrid>
+				<h:panelGrid columns="2" cellpadding="1">
+					<h:outputText value="Población"/>
+					<p:inputText value="#{clientesBean.selectedClient.poblacion}" style="width:400px;text-align: left"/>				
+				</h:panelGrid>				
+				<p:separator style="width:500px;" />
+				<h:outputText value="Expedientes" style="font-weight:bold"/>
+					<h:panelGrid columns="3" cellpadding="1">
+						<p:spacer width="300" height="10" />
+						<h:outputText value="Mostrar cerrados"/>
+						<p:selectBooleanCheckbox id="viewClosed" value="#{clientesBean.viewClosed}" style="text-align: center;">
+							<p:ajax update="filesTable"/>
+						</p:selectBooleanCheckbox>
+					</h:panelGrid>
+				<p:dataTable var="expediente" widgetVar="filesTable" id="filesTable" value="#{clientesBean.filteredFiles}" style="width:700px">
+					<p:column headerText="Id" sortBy="#{expediente.id}" style="text-align: left; width:50px;">
+						<h:outputText value="#{expediente.id}" />
+					</p:column>																	
+					<p:column headerText="Asunto" sortBy="#{expediente.asunto}" style="text-align: left; width:150px;">
+						<h:outputText value="#{expediente.asunto}" />
+					</p:column>				
+					<p:column headerText="Responsable" style="text-align: left; width:50px;">
+						<h:outputText value="#{expediente.responsable1.nombre}" />
+					</p:column>				
+					<p:column headerText="Presupuesto" style="text-align: left; width:50px;">
+						<h:outputText value="#{expediente.presupuesto}" />
+					</p:column>				
+					<p:column headerText="Cerrado"
+						style="text-align: left; width:25px;">
+						<p:selectBooleanCheckbox value="#{expediente.cerrado}" style="text-align: center;" disabled="true"/>
+					</p:column>				
+				</p:dataTable>				
+
+				<h:panelGrid columns="1" cellpadding="5">
+					<h:outputText value="Observaciones" style="font-weight:bold"/>
+					<p:inputTextarea rows="4" cols="75" value="#{clientesBean.selectedClient.observaciones}"/>
+				</h:panelGrid>			
+				
+				<h:panelGrid columns="3" cellpadding="2">
+					<p:commandButton action="#{clientesBean.save()}" ajax="true" value="Guardar" update=":theForm:msgs :theForm:clientesTable"/>
+					<p:spacer width="600" height="10" />
+					<p:commandButton oncomplete="PF('dlgExit').show()" ajax="true" value="Salir"/>
+				</h:panelGrid>			
+			</p:dialog>					
+		</h:form>
+		<p:confirmDialog header="Salir" widgetVar="dlgExit" resizable="false"  id="dlgExit" 
+			message="Perderá los cambios que no haya guardado" width="400"
+			showEffect="clip" modal="true" closable="false" severity="alert">
+			<h:panelGroup layout="block" style="text-align: right">
+				<p:commandButton value="Aceptar" ajax="true"
+					oncomplete="PF('dlgExit').hide();PF('clienteDlg').hide();" update=":theForm:msgs :theForm:clientesTable" />
+				<p:commandButton value="Cancelar" ajax="true"
+					oncomplete="PF('dlgExit').hide();" />
+			</h:panelGroup>
+		</p:confirmDialog>		
+		
+	</ui:define>
+</ui:composition>
+</html>

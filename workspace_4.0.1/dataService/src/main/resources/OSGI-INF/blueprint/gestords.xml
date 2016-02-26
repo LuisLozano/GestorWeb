@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+First install the H2 driver using:
+> install -s mvn:org.hsqldb/hsqldb/2.0.0
+Then copy this file to the deploy folder
+-->
+
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"	
+		   xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0">
+
+	<cm:property-placeholder persistent-id="GestorConfig" update-strategy="reload">
+		<cm:default-properties>
+			<cm:property name="db.url"
+				value="jdbc:hsqldb:file:C:/Desarrollo/Pruebas/SalazarYAsociados/OSGI_Version/BBDD/hsqldb/salazar" />
+		</cm:default-properties>
+	</cm:property-placeholder>
+
+	<bean id="dataSource" class="org.hsqldb.jdbc.JDBCDataSource">
+		<property name="url" value="${db.url}" />
+		<property name="user" value="salazar" />
+		<property name="password" value="salazar" />
+		<!-- property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema(ForeignKeys=false)"/-->
+	</bean>
+	
+	<service interface="javax.sql.DataSource" ref="dataSource">
+		<service-properties>
+			<entry key="osgi.jndi.service.name" value="jdbc/gestords" />
+		</service-properties>
+	</service>
+</blueprint>

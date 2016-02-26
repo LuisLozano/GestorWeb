@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+	xmlns="http://java.sun.com/xml/ns/persistence" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	version="2.0">
+	<persistence-unit name="salazarJPA" transaction-type="JTA">
+		<!-- OPEN JPA -->
+		<!-- provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider-->
+		<!-- HIBERNATE -->
+		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+		<jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=jdbc/gestords)</jta-data-source>
+		<class>es.salazaryasociados.db.model.Cliente</class>
+		<class>es.salazaryasociados.db.model.Documento</class>
+		<class>es.salazaryasociados.db.model.Expediente</class>
+		<class>es.salazaryasociados.db.model.Pago</class>
+		<class>es.salazaryasociados.db.model.Responsable</class>
+		<class>es.salazaryasociados.db.model.User</class>
+		<class>es.salazaryasociados.db.model.Role</class>
+		<class>es.salazaryasociados.db.model.Configuracion</class>
+		<validation-mode>AUTO</validation-mode>
+		<properties>
+			
+			<!-- JPA >
+			<property name="openjpa.jdbc.DBDictionary" value="hsql(SimulateLocking=true)"/>
+			<property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema(ForeignKeys=true)"/>
+			<property name="openjpa.Log" value="slf4j"/>
+			-->
+			<!-- Hibernate -->
+			<!-- property name="hibernate.ejb.cfgfile" value="./etc/hibernate.cfg.xml"/-->
+			<property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect"/>
+			
+			<!-- property name = "hibernate.show_sql" value = "true" /-->			
+		</properties>			
+	</persistence-unit>
+</persistence>

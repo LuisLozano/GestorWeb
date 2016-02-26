@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.3.0" name="gestorwebFeature-0.0.1">
+    <feature version="0.0.0">
+        <feature prerequisite="false" dependency="false">hibernate</feature>
+        <feature prerequisite="false" dependency="false">hibernate-validator</feature>
+        <feature prerequisite="false" dependency="false">jndi</feature>
+        <feature prerequisite="false" dependency="false">jpa</feature>
+        <feature prerequisite="false" dependency="false">pax-jsf-support</feature>
+        <feature prerequisite="false" dependency="false">shiro-core</feature>
+        <feature prerequisite="false" dependency="false">shiro-ehcache</feature>
+        <feature prerequisite="false" dependency="false">transaction</feature>
+        <bundle>mvn:es.salazaryasociados/dataService/0.0.1</bundle>
+        <bundle>mvn:es.salazaryasociados/gestor.commands/0.0.1</bundle>
+        <bundle>mvn:es.salazaryasociados/gestorui/0.0.1/war</bundle>
+        <bundle>mvn:javax.transaction/javax.transaction-api/1.2</bundle>
+        <bundle>mvn:jline/jline/2.12</bundle>
+        <bundle>mvn:org.apache.felix/org.apache.felix.fileinstall/3.5.0</bundle>
+        <bundle>mvn:org.apache.karaf.jaas/org.apache.karaf.jaas.boot/4.0.1</bundle>
+        <bundle>mvn:org.apache.karaf.jaas/org.apache.karaf.jaas.config/4.0.1</bundle>
+        <bundle>mvn:org.apache.karaf.jaas/org.apache.karaf.jaas.modules/4.0.1</bundle>
+        <bundle>mvn:org.apache.karaf.shell/org.apache.karaf.shell.console/4.0.1</bundle>
+        <bundle>mvn:org.apache.karaf.shell/org.apache.karaf.shell.core/4.0.1</bundle>
+        <bundle>mvn:org.apache.sshd/sshd-core/0.14.0</bundle>
+        <bundle>mvn:org.hibernate.javax.persistence/hibernate-jpa-2.1-api/1.0.0.Final</bundle>
+        <bundle>mvn:org.hsqldb/hsqldb/2.3.1</bundle>
+        <bundle>mvn:org.primefaces/primefaces/5.1</bundle>
+        <bundle>mvn:org.slf4j/slf4j-api/1.6.4</bundle>
+        <bundle>mvn:org.slf4j/slf4j-simple/1.6.4</bundle>
+    </feature>
+</features>

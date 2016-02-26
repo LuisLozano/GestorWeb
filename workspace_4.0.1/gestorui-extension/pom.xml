@@ -1,0 +1,93 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>es.salazaryasociados</groupId>
+  <artifactId>gestorui-extension</artifactId>
+  <version>0.0.1</version>
+  <packaging>bundle</packaging>
+  <name>gestorUI-Extension</name>
+  <description>Configuración</description>
+  
+    <properties>
+        <maven-bundle-plugin.version>2.4.0</maven-bundle-plugin.version>
+        <osgi.version>5.0.0</osgi.version>
+		<jsf-myfaces.version>2.1.15</jsf-myfaces.version>
+		<jsf-ri.version>1.2_13</jsf-ri.version>        
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <version>${osgi.version}</version>
+            <scope>provided</scope>
+        </dependency>
+		<dependency>
+			<groupId>org.apache.myfaces.core</groupId>
+			<artifactId>myfaces-api</artifactId>
+			<version>${jsf-myfaces.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.myfaces.core</groupId>
+			<artifactId>myfaces-impl</artifactId>
+			<version>${jsf-myfaces.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>es.llaroqui</groupId>
+			<artifactId>service-provider</artifactId>
+			<version>0.0.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>es.salazaryasociados</groupId>
+			<artifactId>dataService</artifactId>
+			<version>0.0.1</version>
+			<scope>provided</scope>
+		</dependency>				
+
+		<dependency>
+			<groupId>es.salazaryasociados</groupId>
+			<artifactId>uiUtils</artifactId>
+			<version>0.0.1</version>
+			<scope>compile</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.primefaces</groupId>
+			<artifactId>primefaces</artifactId>
+			<version>5.0</version>
+			<scope>provided</scope>
+		</dependency>		
+		
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>${maven-bundle-plugin.version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-Version>${project.version}</Bundle-Version>
+                        <Fragment-Host>es.salazaryasociados.gestorui</Fragment-Host>
+                        <Bundle-Classpath>.</Bundle-Classpath>
+                        <!-- IMPORTANTE ELIMINAR Import-Package -->
+						<_removeheaders>
+							Include-Resource,
+							Private-Package,
+							Embed-Dependency,
+							Import-Package,
+							Embed-Transitive,
+							Export-Package
+						</_removeheaders>                        
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    
+</project>
