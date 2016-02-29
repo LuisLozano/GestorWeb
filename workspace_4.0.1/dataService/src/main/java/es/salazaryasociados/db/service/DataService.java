@@ -24,6 +24,7 @@ import es.salazaryasociados.db.control.ClientDao;
 import es.salazaryasociados.db.control.ConfiguracionDao;
 import es.salazaryasociados.db.control.DocumentoDao;
 import es.salazaryasociados.db.control.ExpedienteDao;
+import es.salazaryasociados.db.control.ListadoExpRespDao;
 import es.salazaryasociados.db.control.PagoDao;
 import es.salazaryasociados.db.control.ResponsableDao;
 import es.salazaryasociados.db.control.UserDao;
@@ -32,6 +33,7 @@ import es.salazaryasociados.db.exceptions.GestorErrors;
 import es.salazaryasociados.db.model.Cliente;
 import es.salazaryasociados.db.model.Configuracion;
 import es.salazaryasociados.db.model.Expediente;
+import es.salazaryasociados.db.model.ListadoExpResp;
 import es.salazaryasociados.db.model.Pago;
 import es.salazaryasociados.db.model.Responsable;
 import es.salazaryasociados.db.model.Role;
@@ -47,6 +49,7 @@ public class DataService implements IDataService, ValidationProviderResolver   {
 	private PagoDao pagoDao;
 	private DocumentoDao documentoDao;
 	private ConfiguracionDao configuracionDao;
+	private ListadoExpRespDao listRespExpDao;
 	
 	private ValidatorFactory validatorF;
 	
@@ -169,6 +172,14 @@ public class DataService implements IDataService, ValidationProviderResolver   {
 
 	public void setConfiguracionDao(ConfiguracionDao configuracionDao) {
 		this.configuracionDao = configuracionDao;
+	}
+
+	public ListadoExpRespDao getListRespExpDao() {
+		return listRespExpDao;
+	}
+
+	public void setListRespExpDao(ListadoExpRespDao listRespExpDao) {
+		this.listRespExpDao = listRespExpDao;
 	}
 
 	public List<Cliente> getAllClients(int pageSize, int first,
@@ -738,5 +749,26 @@ public class DataService implements IDataService, ValidationProviderResolver   {
 	@Override
 	public Map<String, String> getAllThemes() {
 		return themes;
+	}
+
+	@Override
+	public List<ListadoExpResp> getAllExpResp(int pageSize, int first,
+			Map<String, Object> params, String order, boolean desc)
+			throws DataException {
+		if (listRespExpDao != null)
+		{
+			return listRespExpDao.getAll(pageSize, first, params, order, desc);
+		}
+		throw new DataException(GestorErrors.LISTADO_EXP_DAO_NOT_DEFINED);
+	}
+
+	@Override
+	public long getAllExpRespCount(Map<String, Object> params)
+			throws DataException {
+		if (listRespExpDao != null)
+		{
+			return listRespExpDao.getCount(params);
+		}
+		throw new DataException(GestorErrors.LISTADO_EXP_DAO_NOT_DEFINED);
 	}
 }

@@ -7,6 +7,7 @@ import es.salazaryasociados.db.exceptions.DataException;
 import es.salazaryasociados.db.model.Cliente;
 import es.salazaryasociados.db.model.Configuracion;
 import es.salazaryasociados.db.model.Expediente;
+import es.salazaryasociados.db.model.ListadoExpResp;
 import es.salazaryasociados.db.model.Pago;
 import es.salazaryasociados.db.model.Responsable;
 import es.salazaryasociados.db.model.Role;
@@ -43,4 +44,8 @@ public interface IDataService {
 	
 	public void deleteExpediente(int expID) throws DataException;
 	public void deleteCliente(int clientID)  throws DataException;
+	
+	//Métodos para la vista
+	public List<ListadoExpResp>getAllExpResp(int pageSize, int first, final Map<String, Object> params, String order, boolean desc) throws DataException;
+	public long getAllExpRespCount (final Map<String, Object> params) throws DataException;
 }

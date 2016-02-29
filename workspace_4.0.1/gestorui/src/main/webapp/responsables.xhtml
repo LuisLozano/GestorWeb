@@ -29,41 +29,60 @@
 				
 				<p:tabView id="files">
 					<p:tab title="Informes" id="informesTab">
-						<p:selectManyCheckbox id="basic" >
-							<f:selectItem itemLabel="Incluir cerrados" itemValue="Incluir cerrados" />
-							<f:selectItem itemLabel="Incluir si aparece como segundo responsable" itemValue="Segundo responsable" />
-							<p:commandButton process=":theForm:responsablesTable" update=":theForm:carDetail :theForm:files:file" icon="ui-icon-search" value="View"/>
-						</p:selectManyCheckbox>						
+						<h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="2">
+							<p:selectBooleanCheckbox value="#{responsablesBean.includeClosed}" itemLabel="Incluir cerrados">
+								<p:ajax update="@this" listener="#{responsablesBean.setIncludeClosed}" />
+							</p:selectBooleanCheckbox>
+							<p:selectBooleanCheckbox value="#{responsablesBean.includeSecondResp}" itemLabel="Segundo responsable">
+								<p:ajax update="@this" listener="#{responsablesBean.setIncludeSecondResp}" />
+							</p:selectBooleanCheckbox>						
+							<p:commandButton process=":theForm:responsablesTable" update=":theForm:files:fileTab" icon="ui-icon-search" value="Filtrar"/>
+						</h:panelGrid>
+						<h:commandLink>
+							<h:graphicImage value="resources/icon_excel.png" />
+							<p:dataExporter type="xls" target="fileTab" fileName="expedientes" />
+						</h:commandLink>
+			 
+						<h:commandLink>
+							<h:graphicImage value="resources/icon_pdf.png" />
+							<p:dataExporter type="pdf" target="fileTab" fileName="expedientes"/>
+						</h:commandLink>						 						
 						<p:dataTable var="file"
-								id="file"
+								id="fileTab"
 								value="#{responsablesBean.filesDataModel}"
 								emptyMessage="No hay registros ¿Ha seleccionado un responsable?"
 								scrollRows="20"
 								liveScroll="true"
 								scrollHeight="500"
 								lazy="true"
-								scrollable="true">
-
-								<p:column headerText="ID">
-								   <h:outputText value="#{file.id}" />
+								scrollable="true"
+								style="width:1000px;"
+								sortBy="#{file.apellidos}"
+								sortOrder="ASCENDING"
+								>
+								<p:column headerText="ID" filterBy="#{file.expId}" filterMatchMode="exact" filterStyle="width:95%;" style="text-align: left; width:40px;">
+								   <h:outputText value="#{file.expId}" />
 								</p:column>
-								<p:column headerText="Apellidos">
-								   <h:outputText value="#{file.surname}" />
+								<p:column headerText="Apellido" filterBy="#{file.apellidos}" filterMatchMode="exact" filterStyle="width:95%;" style="text-align: left; width:150px;">
+								   <h:outputText value="#{file.apellidos}" />
 								</p:column>
-								<p:column headerText="Nombre">
-								   <h:outputText value="#{file.name}" />
+								<p:column headerText="Nombre" filterBy="#{file.nombre}" filterMatchMode="exact" filterStyle="width:95%;" style="text-align: left; width:100px;">
+								   <h:outputText value="#{file.nombre}" />
 								</p:column>
-								<p:column headerText="Asunto" filterMatchMode="exact">
-								   <h:outputText value="#{file.subject}" />
+								<p:column headerText="Asunto" filterMatchMode="exact" style="text-align: left; width:150px;">
+								   <h:outputText value="#{file.asunto}" />
 								</p:column>								
-								<p:column headerText="Teléfono">
-								   <h:outputText value="#{file.phone}" />
+								<p:column headerText="Teléfono" style="text-align: left; width:80px;">
+								   <h:outputText value="#{file.telefono}" />
 								</p:column>
-								<p:column headerText="Pago">
-								   <h:outputText value="#{file.payment}" />
+								<p:column headerText="Pagado" style="text-align: left; width:60px;">
+								   <h:outputText value="#{file.pagado}" />
 								</p:column>
-								<p:column headerText="Cerrado">
-								   <h:outputText value="#{file.closed}" />
+								<p:column headerText="Presupuest" style="text-align: left; width:60px;">
+								   <h:outputText value="#{file.presupuesto}" />
+								</p:column>								
+								<p:column headerText="RIP" style="text-align: left; width:20px;">
+								   <p:selectBooleanCheckbox value="#{file.cerrado}" style="text-align: center;" disabled="true"/>
 								</p:column>								
 						</p:dataTable>						
 					</p:tab>
@@ -73,10 +92,6 @@
 				</p:tabView>
 				
 			</h:panelGrid>
-			
-			<p:outputPanel id="carDetail" style="text-align:center;">
-				<h:outputText value="#{responsablesBean.selectedResponsable.id}" />
-			</p:outputPanel>
 		</h:form>
 	</ui:define>
 </ui:composition>

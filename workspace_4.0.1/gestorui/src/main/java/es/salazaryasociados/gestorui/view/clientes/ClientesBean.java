@@ -106,7 +106,7 @@ public class ClientesBean implements Serializable {
 		
 		if (expedientes != null) {
 			for (Expediente exp : expedientes) {
-				if (exp.getCerrado() && closed) {
+				if (!exp.getCerrado() || closed) {
 					result.add(exp);
 				}
 			}

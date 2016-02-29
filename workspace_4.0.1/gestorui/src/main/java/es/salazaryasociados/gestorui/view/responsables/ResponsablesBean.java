@@ -2,6 +2,7 @@ package es.salazaryasociados.gestorui.view.responsables;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Locale;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -31,6 +32,8 @@ public class ResponsablesBean implements Serializable{
 	private Integer selectedResponsableID;
 	private Responsable selectedResponsable;
 	private List<Responsable> responsables;
+	private boolean includeClosed = false;
+	private boolean includeSecondResp = false;
 	
 	@PostConstruct
     public void init() {
@@ -90,6 +93,29 @@ public class ResponsablesBean implements Serializable{
 		}		
 	}
 	
+	public boolean filterByPesupuesto(Object value, Object filter, Locale locale) {
+        String filterText = (filter == null) ? null : filter.toString().trim();
+        if(filterText == null||filterText.equals("")) {
+            return true;
+        }
+         
+        if(value == null) {
+            return false;
+        }
+            
+        char comparator = filterText.charAt(0);
+        if (filterText.startsWith(">") || filterText.startsWith("<")) {
+        	filterText = filterText.substring(1).trim();
+        }
+        
+        if (comparator == '>')
+        	return ((Comparable) value).compareTo(Integer.valueOf(filterText)) > 0;
+        else if (comparator == '<')
+           	return ((Comparable) value).compareTo(Integer.valueOf(filterText)) < 0;
+        else
+        	return ((Comparable) value).compareTo(Integer.valueOf(filterText)) == 0;
+    }	
+	
     public void onRowEdit(RowEditEvent event) {
     	System.out.println("Llega");
     }
@@ -109,5 +135,21 @@ public class ResponsablesBean implements Serializable{
 
 	public void setResponsables(List<Responsable> responsables) {
 		this.responsables = responsables;
+	}
+
+	public boolean getIncludeClosed() {
+		return includeClosed;
+	}
+
+	public void setIncludeClosed(boolean includeClosed) {
+		this.includeClosed = includeClosed;
+	}
+
+	public boolean getIncludeSecondResp() {
+		return includeSecondResp;
+	}
+
+	public void setIncludeSecondResp(boolean includeSecondResp) {
+		this.includeSecondResp = includeSecondResp;
 	}    
 }

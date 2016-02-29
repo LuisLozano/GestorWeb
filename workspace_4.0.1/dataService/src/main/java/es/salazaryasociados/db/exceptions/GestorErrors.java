@@ -51,7 +51,8 @@ public enum GestorErrors {
 	
 	CONFIGURACION_DAO_NOT_DEFINED("No se ha definido el servicio de acceso a la configuración"), 
 	CONFIGURACION_NOT_EXISTS ("No se pueden crear objetos nuevos de configuración"), 
-	CONFIGURACION_THEME_NOT_EXISTS ("El tema seleccionado no existe")
+	CONFIGURACION_THEME_NOT_EXISTS ("El tema seleccionado no existe"), 
+	LISTADO_EXP_DAO_NOT_DEFINED ("No se ha definido el DAO para listado de expedientes por responsable")
 	;
 	
 	private String message = "";
