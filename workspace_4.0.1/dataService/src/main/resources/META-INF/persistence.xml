@@ -18,6 +18,7 @@
 		<class>es.salazaryasociados.db.model.User</class>
 		<class>es.salazaryasociados.db.model.Role</class>
 		<class>es.salazaryasociados.db.model.Configuracion</class>
+		<class>es.salazaryasociados.db.model.ListadoExpResp</class>
 		<validation-mode>AUTO</validation-mode>
 		<properties>
 			
@@ -30,7 +31,7 @@
 			<!-- property name="hibernate.ejb.cfgfile" value="./etc/hibernate.cfg.xml"/-->
 			<property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect"/>
 			
-			<!-- property name = "hibernate.show_sql" value = "true" /-->			
+			<property name = "hibernate.show_sql" value = "true"/>			
 		</properties>			
 	</persistence-unit>
 </persistence>

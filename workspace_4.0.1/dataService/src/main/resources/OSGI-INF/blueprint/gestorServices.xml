@@ -17,9 +17,14 @@
 		<property name="pagoDao" ref="pagoDao"/>
 		<property name="documentoDao" ref="documentDao"/>
 		<property name="configuracionDao" ref="configuracionDao"/>
+		<property name="listRespExpDao" ref="listRespExpDao"/>
 		<tx:transaction method="*" value="Required" />
 	</bean>
-	    	   
+
+	<bean id="listRespExpDao" 
+		class="es.salazaryasociados.db.control.ListadoExpRespDao">
+	</bean>
+	
 	<bean id="clientDao"
 		class="es.salazaryasociados.db.control.ClientDao">
 	</bean>
