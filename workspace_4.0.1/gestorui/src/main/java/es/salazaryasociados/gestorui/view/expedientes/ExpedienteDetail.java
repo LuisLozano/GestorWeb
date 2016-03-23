@@ -232,6 +232,7 @@ public class ExpedienteDetail {
 		if (pID >= 0 && index >= 0 && index < pagos.size()){
 			try {
 				dataService.removePagoFromExpediente(theFile.getId(), pID);
+				theFile = dataService.getFileById(expedientesBean.getSelectedFile().intValue(), "pagos", "clientes");
 				pagado = pagado.subtract(pagos.get(index).getCantidad());
 				pagos.remove(index);				
 				moroso = theFile.getPresupuesto().subtract(pagado);
