@@ -116,6 +116,9 @@
 						</p:selectBooleanCheckbox>
 					</h:panelGrid>
 				<p:dataTable var="expediente" widgetVar="filesTable" id="filesTable" value="#{clientesBean.filteredFiles}" style="width:700px">
+					<p:column style="width:32px;text-align: center">
+						<p:commandButton action="#{expedientesBean.showFileDetail(expediente.id)}" ajax="false" icon="ui-icon-search"/>
+					</p:column>					
 					<p:column headerText="Id" sortBy="#{expediente.id}" style="text-align: left; width:50px;">
 						<h:outputText value="#{expediente.id}" />
 					</p:column>																	
