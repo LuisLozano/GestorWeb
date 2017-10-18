@@ -1,0 +1,163 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>es.salazaryasociados</groupId>
+	<artifactId>gestorweb</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<properties>
+		<gestorWeb.version>0.0.1-SNAPSHOT</gestorWeb.version>
+		<gestorweb.model.version>0.0.1-SNAPSHOT</gestorweb.model.version>
+		<gestorweb.control.version>0.0.1-SNAPSHOT</gestorweb.control.version>
+		<gestorweb.services.data.api>0.0.1-SNAPSHOT</gestorweb.services.data.api>
+		<gestorweb.services.data.impl>0.0.1-SNAPSHOT</gestorweb.services.data.impl>
+		<gestorweb.gestorui>0.0.1-SNAPSHOT</gestorweb.gestorui>
+		
+		<java.version>1.8</java.version>
+		<maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
+		<jacoco.version>0.7.5.201505241946</jacoco.version>
+		<hibernate.jpa.api.version>1.0.0.Final</hibernate.jpa.api.version>
+		<hibernate.validator.version>5.0.3.Final</hibernate.validator.version>
+		<hibernate.version>4.3.6.Final</hibernate.version>
+		<lombok.version>1.16.18</lombok.version>	
+	</properties>
+	
+    <parent>
+        <groupId>org.apache.karaf</groupId>
+        <artifactId>karaf</artifactId>
+        <version>4.1.2</version>
+        <relativePath>../../apache-karaf-4.1.2/pom.xml</relativePath>
+    </parent>
+    	
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<inherited>true</inherited>
+					<version>${maven-compiler-plugin.version}</version>
+					<configuration>
+						<source>${java.version}</source>
+						<target>${java.version}</target>
+					</configuration>
+				</plugin>
+
+				<!-- Construcción de bundles -->
+				<plugin>
+					<groupId>org.apache.felix</groupId>
+					<artifactId>maven-bundle-plugin</artifactId>
+					<version>${maven-bundle-plugin.version}</version>
+					<extensions>true</extensions>
+					<configuration>
+						<instructions>
+							<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+							<Bundle-Version>${project.version}</Bundle-Version>
+							<Import-Package>*</Import-Package>
+						</instructions>
+					</configuration>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.karaf.tooling</groupId>
+					<artifactId>karaf-maven-plugin</artifactId>
+					<version>${karaf.version}</version>
+					<extensions>true</extensions>
+				</plugin>
+				
+				<!-- Covertura -->
+				<plugin>
+					<groupId>org.jacoco</groupId>
+					<artifactId>jacoco-maven-plugin</artifactId>
+					<version>${jacoco.version}</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>prepare-agent</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>report</id>
+							<phase>prepare-package</phase>
+							<goals>
+								<goal>report</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>	
+	
+	<dependencyManagement>
+		<dependencies>
+			<!-- OSGi dependencies -->
+			<dependency>
+				<groupId>org.osgi</groupId>
+				<artifactId>org.osgi.core</artifactId>
+				<version>${osgi.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+			    <groupId>org.osgi</groupId>
+			    <artifactId>org.osgi.compendium</artifactId>		   
+			    <version>${osgi.compendium.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.hibernate.javax.persistence</groupId>
+				<artifactId>hibernate-jpa-2.1-api</artifactId>
+				<version>${hibernate.jpa.api.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-validator</artifactId>
+				<version>${hibernate.validator.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-core</artifactId>
+				<version>${hibernate.version}</version>
+				<scope>provided</scope>
+			</dependency>		
+			
+			<!-- GestorWeb dependencies -->
+			<dependency>
+				<groupId>es.salazaryasociados</groupId>
+				<artifactId>gestorweb_model</artifactId>
+				<version>${gestorweb.model.version}</version>
+				<scope>provided</scope>			
+			</dependency>	
+			<dependency>
+				<groupId>es.salazaryasociados</groupId>
+				<artifactId>gestorweb_control</artifactId>
+				<version>${gestorweb.control.version}</version>
+				<scope>provided</scope>			
+			</dependency>			
+			<dependency>
+				<groupId>es.salazaryasociados</groupId>
+				<artifactId>services.data.api</artifactId>
+				<version>${gestorweb.services.data.api}</version>
+				<scope>provided</scope>			
+			</dependency>			
+			
+			<dependency>
+	            <groupId>org.projectlombok</groupId>
+	            <artifactId>lombok</artifactId>
+				<version>${lombok.version}</version>
+				<scope>provided</scope>				            
+	        </dependency>			
+		</dependencies>
+	</dependencyManagement>	
+	
+	<modules>
+		<module>./model</module>
+		<module>./control</module>
+		<module>services/data_api</module>
+		<module>services/data_impl</module>
+		<module>./gestorui</module>
+		<module>features/feature</module>
+	</modules>
+</project>

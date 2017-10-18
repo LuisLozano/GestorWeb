@@ -1,0 +1,161 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:dialog id="clientDetailID" widgetVar="clientEdit" modal="true"
+		header="Cliente: #{(editClient.clientDetail.id > 0)? editClient.clientDetail.id : 'nuevo'}"
+		dynamic="true">		
+		
+		<p:ajax event="close" update="@([id$=clientsTable])" />
+		
+		<h:form id="clientForm">
+			<p:growl id="msgs" showDetail="true" autoUpdate="true"/>
+
+			<h:outputText value="Identificación" style="font-weight:bold" />
+			<h:panelGrid columns="3" cellpadding="8">
+				<h:outputText value="Nombre y Apellidos"/>
+				<p:inputText value="#{editClient.clientDetail.nombre}"
+					style="width:150px;text-align: left" id="nombre"/>
+				<p:inputText value="#{editClient.clientDetail.apellidos}"
+					style="width:300px;text-align: left" id="apellidos"/>
+			</h:panelGrid>
+			<h:panelGrid columns="3" cellpadding="8">
+				<h:outputText value="DNI/NIF"/>
+				<p:inputMask value="#{editClient.clientDetail.dni}" mask="99.999.999a" required="true"
+					style="width:150px;text-align: left;margin-left:73px" id="dni" />
+				<p:message for="dni" display="Mensaje" id="DNIErrorMsg"/>					
+			</h:panelGrid>
+
+			<p:tabView id="clientDetailPanel" style="width:1200px;height:350px">
+				<p:tab id="contactTab" title="Contacto">
+					<h:panelGrid columns="3" cellpadding="8" style="margin-top:15px;">
+						<h:outputText value="Teléfono" />
+						<p:inputText value="#{editClient.clientDetail.telefono}"
+							style="width:90px;text-align: left" id="telefono"/>
+						<p:inputText value="#{editClient.clientDetail.telefono2}"
+							style="width:90px;text-align: left" id="telefono2"/>
+					</h:panelGrid>
+					<h:panelGrid columns="2" cellpadding="8">
+						<h:outputText value="Correo electrónico" />
+						<p:inputText value="#{editClient.clientDetail.correoElectronico}"
+							style="width:300px;text-align: left" id="correo"/>
+					</h:panelGrid>
+					<h:panelGrid columns="1" cellpadding="5">
+						<h:outputText value="Dirección" style="font-weight:bold" />
+						<p:inputTextarea rows="2" cols="90"
+							value="#{editClient.clientDetail.direccion}" id="direccion"/>
+					</h:panelGrid>
+					<h:panelGrid columns="2" cellpadding="1">
+						<h:outputText value="Población" />
+						<p:inputText value="#{editClient.clientDetail.poblacion}"
+							style="width:410px;text-align: left" id="poblacion"/>
+					</h:panelGrid>				
+				</p:tab>
+				
+				<p:tab id="filesTab" title="Expedientes">
+					<p:dataTable var="file" widgetVar="filesTable" id="filesTable" value="#{editClient.clientDetail.files}" style="width:1000px; margin-top:15px;" scrollable="true" scrollHeight="100">
+				        <f:facet name="header">
+								Lista de expedientes
+						</f:facet>			
+					
+						<p:column style="width:32px;text-align: center">
+							<p:commandButton 
+								action="#{editFile.editAction}"
+								actionListener="#{editFile.attrListener}"
+								oncomplete="PF('clientEdit').hide();PF('fileEdit').show();"
+								icon="ui-icon-search"
+								update=":fileDetailID"
+								>
+								<p:resetInput target="fileDetailID"/>
+								<f:attribute name="actionButton" value="update" />
+								<f:setPropertyActionListener value="#{file}"
+									target="#{editFile.fileSummary}" />						
+							</p:commandButton>
+						</p:column>					
+						<p:column headerText="Id" sortBy="#{file.id}" style="text-align: left; width:10%;">
+							<h:outputText value="#{file.id}" />
+						</p:column>																	
+						<p:column headerText="Asunto" sortBy="#{file.asunto}" style="text-align: left; width:25%;">
+							<h:outputText value="#{file.asunto}" />
+						</p:column>				
+						<p:column headerText="Responsable" style="text-align: left; width:15%;">
+							<h:outputText value="#{file.responsable}" />
+						</p:column>				
+						<p:column headerText="Presupuesto" style="text-align: left; width:15%;">
+							<h:outputText value="#{file.presupuesto}">
+								<f:convertNumber pattern="#,##0.00 ¤" currencySymbol="€" />
+							</h:outputText>
+						</p:column>				
+						<p:column headerText="Pagado" style="text-align: left; width:15%;">
+							<h:outputText value="#{file.pagado}">
+								<f:convertNumber pattern="#,##0.00 ¤" currencySymbol="€" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="Moroso" style="text-align: left; width:15%;">
+							<h:outputText value="#{file.moroso}">
+								<f:convertNumber pattern="#,##0.00 ¤" currencySymbol="€" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="Cerrado"
+							style="text-align: left; width:5%;">
+							<p:selectBooleanCheckbox value="#{file.cerrado}" style="text-align: center;" disabled="true"/>
+						</p:column>				
+					</p:dataTable>
+				</p:tab>
+				<p:tab id="obsTab" title="Observaciones">
+					<p:inputTextarea rows="4" cols="175"
+						value="#{editClient.clientDetail.observaciones}" id="observaciones"/>
+				</p:tab>
+				
+				<p:tab id="documents" title="Documentos">
+					<p:dataTable var="document" widgetVar="documentsTable"
+						id="documentsTableID" value="#{editClient.clientDetail.documents}"
+						style="width:1150px;height:150px" scrollHeight="100"
+						paginator="true" rows="10" paginatorPosition="bottom"
+						paginatorTemplate="Documentos asociados al expediente: #{editClient.clientDetail.documents.size()} {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+
+						<p:column style="width:40px;text-align: center">
+							<p:commandButton icon="ui-icon-trash"
+								actionListener="#{editClient.deleteDocument(document)}"
+								update="@([id$=documentsTableID])" />
+						</p:column>
+						<p:column style="width:40px;text-align: center">
+							<p:commandButton icon="ui-icon-circle-arrow-s" ajax="false"
+								actionListener="#{editClient.prepDownload(document)}">
+								<p:fileDownload value="#{editClient.downloadFile}" />
+							</p:commandButton>
+						</p:column>
+						<p:column headerText="Descripcion" style="text-align: left;">
+							<h:outputText value="#{document.descripcion}">
+							</h:outputText>
+						</p:column>
+					</p:dataTable>
+					<p:fileUpload fileUploadListener="#{editClient.handleFileUpload}"
+						label="Seleccionar" cancelLabel="Cancelar"
+						uploadLabel="Subir todos" mode="advanced" dragDropSupport="true"
+						style="margin-top:15px;width:1150px"
+						update="@([id$=documentsTableID])" fileLimit="2" />
+				</p:tab>				
+				
+			</p:tabView>			
+			
+			<div style="margin-top:15px;">
+				<div class=" col-xs-12 text-right">
+					<p:commandButton value="Guardar" 
+						process="@this nombre apellidos clientForm:clientDetailPanel:telefono clientForm:clientDetailPanel:telefono2 clientForm:clientDetailPanel:correo clientForm:clientDetailPanel:direccion clientForm:clientDetailPanel:poblacion clientForm:clientDetailPanel:observaciones dni"
+						action="#{editClient.editAction}"
+						actionListener="#{editClient.attrListener}"					
+						oncomplete="if (args &amp;&amp; !args.validationFailed) PF('clientEdit').hide()"
+						update="clientForm:msgs clientForm:DNIErrorMsg"
+						>
+						<f:attribute name="actionButton" value="save" />
+					</p:commandButton>
+					<p:spacer width="1200" height="10" />
+					<p:commandButton value="Salir" oncomplete="PF('clientEdit').hide()"/>
+				</div>
+			</div>
+		</h:form>
+	</p:dialog>
+</ui:composition>

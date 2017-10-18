@@ -1,0 +1,47 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/facelets/templates/defaultLayout.xhtml">
+	<ui:define name="title">
+		<h:outputText value="Configuración" />
+	</ui:define>
+	<ui:define name="content">
+		<h:form id="configurationForm">
+			<p:growl id="msgs" showDetail="true" autoUpdate="true" />
+
+			<p:tabView>
+				<p:tab title="Asuntos">
+					<p:dataTable var="subject" widgetVar="subjectsTable"
+						id="subjectsTableID" value="#{configurationBean.subjects}"
+						style="width:1200px;" scrollHeight="500"
+						emptyMessage="No hay registros" scrollRows="20" liveScroll="true"
+						lazy="true" scrollable="true" sortBy="#{asunto}"
+						filterBy="#{asunto}" sortOrder="ASCENDING"						
+						selection="#{configurationBean.selectedSubjects}"
+						rowKey="#{subject.toString()}">
+
+						<p:column selectionMode="multiple" style="width:16px;text-align:center"/>
+						
+						<p:column headerText="Asunto" style="text-align: left; width:95%;"
+							filterBy="#{asunto}" filterStyle="width:95%;">
+							<h:outputText value="#{subject}" />
+						</p:column>
+					</p:dataTable>
+
+				<h:panelGrid columns="2" columnClasses="label,value" border = "1" style="margin-top:15px;">
+				
+					<h:outputText value="Nuevo asunto"/> 
+					<p:inputText id="newSubject" value="#{configurationBean.newSubject}" style="width:1000px;text-align: left"/>
+					<p:commandButton process="subjectsTableID newSubject"
+						icon="ui-icon-search" value="Unificar"
+						action="#{configurationBean.unify}" 
+						update="@([id$=subjectsTableID]) @([id$=newSubject])"/>
+				</h:panelGrid>
+				</p:tab>
+			</p:tabView>
+		</h:form>
+
+	</ui:define>
+</ui:composition>

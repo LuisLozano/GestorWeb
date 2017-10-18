@@ -1,0 +1,371 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:dialog id="fileDetailID" widgetVar="fileEdit" modal="true"
+		header="Expediente: #{(editFile.fileDetail.id > 0)? editFile.fileDetail.id : 'nuevo'}"
+		dynamic="true">
+
+		<p:ajax event="close" update="@([id$=filesTable])" />
+		
+		<h:form id="fileForm">				
+			<p:growl id="msgs" showDetail="true" autoUpdate="true"/>	
+			<p:selectBooleanButton id="openChk"
+				value="#{editFile.fileDetail.cerrado}" onLabel="Cerrado"
+				offLabel="Abierto" onIcon="ui-icon-check" offIcon="ui-icon-close"
+				style="float:right; #{editFile.fileDetail.cerrado ? 'color:red;' : 'color:balck;'}"
+				update="openChk" title="Pulse para cambiar el estado">
+				<p:ajax update="openChk" />
+			</p:selectBooleanButton>
+
+			<h:panelGrid columns="2" cellpadding="10">
+				<h:outputText value="Asunto" />
+				<p:autoComplete id="asto" forceSelection="false"
+					value="#{editFile.fileDetail.asunto}"
+					completeMethod="#{editFile.completeText}"
+					inputStyle="width:620px;text-align: left" />
+			</h:panelGrid>
+
+			<h:panelGrid columns="2" cellpadding="10">
+				<h:panelGrid columns="3" cellpadding="10">
+					<h:outputText value="Responsable 1" />
+					<p:selectOneMenu style="width:200px;text-align: left"
+						value="#{editFile.fileDetail.responsible1}" id="resp1" required="true"
+						converter="responsibleConverter">
+						<f:selectItem itemLabel="--" itemValue="" noSelectionOption="true" />
+						<f:selectItems value="#{editFile.responsibles}" var="resp"
+							itemLabel="#{resp.nombre}" itemValue="#{resp}" />
+					</p:selectOneMenu>
+					<p:message for="resp1" display="Mensaje" id="RespErrorMsg"/>					
+				</h:panelGrid>
+
+				<h:panelGrid columns="2" cellpadding="10">
+					<h:outputText value="Responsable 2" />
+					<p:selectOneMenu style="width:200px;text-align: left"
+						value="#{editFile.fileDetail.responsible2}" id="resp2"
+						converter="responsibleConverter">
+						<f:selectItem itemLabel="--" itemValue="" noSelectionOption="true" />
+						<f:selectItems value="#{editFile.responsibles}" var="resp"
+							itemLabel="#{resp.nombre}" itemValue="#{resp}" />
+					</p:selectOneMenu>
+				</h:panelGrid>
+			</h:panelGrid>			
+
+			<p:tabView id="fileDetailPanel" style="width:1200px;height:650px">
+				<p:tab id="observaciones" title="Observaciones">
+					<h:panelGrid columns="2" cellpadding="10">
+						<h:outputText value="Observaciones" />
+						<p:inputTextarea rows="4" cols="200"
+							value="#{editFile.fileDetail.observaciones}" id="obs" />
+					</h:panelGrid>
+				</p:tab>
+
+				<p:tab id="events" title="Eventos">
+					<p:scrollPanel style="width:1150px;height:575px">
+						<p:schedule id="schedule" value="#{editFile.lazyEventModel}"
+							locale="es" pattern="dd/MM/yyyy HH:mm" effect="explode"
+							ignoreTimezone="false" draggable="false">
+
+							<p:ajax event="dateSelect" listener="#{editFile.onDateSelect}"
+								update="@([id$=eventDetails])"
+								oncomplete="PF('eventDialog').show();" />
+							<p:ajax event="eventSelect" listener="#{editFile.onEventSelect}"
+								update="@([id$=eventDetails])"
+								oncomplete="PF('eventDialog').show();" />
+							<p:ajax event="eventMove" listener="#{editFile.onEventMove}"/>
+							<p:ajax event="eventResize" listener="#{editFile.onEventResize}"/>
+
+						</p:schedule>
+					</p:scrollPanel>
+				</p:tab>
+
+				<p:tab id="timelineTab" title="Línea temporal">
+					<p:timeline id="timeline" value="#{editFile.timeLineModel}" height="250px" 
+					        selectable="true" 
+					        zoomable="true" 
+					        moveable="true" 
+					        stackEvents="trie" 
+					        axisOnTop="false"              
+					        eventStyle="box" 
+					        showCurrentTime="true" 
+					        showNavigation="false">
+					        
+					        <p:ajax event="select" listener="#{editFile.onTimelineEventSelect}"/>
+					</p:timeline> 					
+				</p:tab>
+				<p:tab id="clientes" title="Clientes ">
+					<p:dataTable var="cliente" id="clientsTable"
+						widgetVar="clientesTable" style="width:1150px;;height:520px"
+						value="#{editFile.fileDetail.clients}" scrollable="true"
+						paginator="true" rows="15" paginatorPosition="bottom"
+						paginatorTemplate="Clientes asociados al expediente: #{editFile.fileDetail.clients.size()} {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+
+						<f:facet name="header">
+							<p:commandButton icon="ui-icon-plus"
+								oncomplete="PF('addClient').show();" update="addClientID">
+							</p:commandButton>
+						</f:facet>
+
+						<p:column style="width:5%;text-align: center">
+							<p:commandButton id="btnDeleteClient" icon="ui-icon-trash"
+								actionListener="#{editFile.deleteClient(cliente)}"
+								update="@([id$=clientsTable]) @([id$=totalClients])"
+								disabled="#{editFile.fileDetail.clients.size() lt 2}">
+								<p:tooltip id="toolTipTrash" for="btnDeleteClient"
+									value="Debe existir al menos un cliente" position="top"
+									rendered="#{editFile.fileDetail.clients.size() lt 2}" />
+							</p:commandButton>
+						</p:column>
+						<p:column style="width:5%;text-align: center">
+							<p:commandButton action="#{editClient.editAction}"
+								actionListener="#{editClient.attrListener}"
+								oncomplete="PF('clientEdit').show();" icon="ui-icon-search"
+								update=":clientDetailID @([id$=clientsTable])">
+								<p:resetInput target="clientDetailID" />
+								<f:attribute name="actionButton" value="update" />
+								<f:setPropertyActionListener value="#{cliente}"
+									target="#{editClient.clientSummary}" />
+							</p:commandButton>
+						</p:column>
+						<p:column headerText="Nombre" style="text-align: left; width:50%;">
+							<h:outputText value="#{cliente.nombre} #{cliente.apellidos}" />
+						</p:column>
+						<p:column headerText="Teléfono"
+							style="text-align: left; width:10%;">
+							<h:outputText value="#{cliente.telefono}" />
+						</p:column>
+						<p:column headerText="Teléfono 2"
+							style="text-align: left; width:10%;">
+							<h:outputText value="#{cliente.telefono2}" />
+						</p:column>
+						<p:column headerText="Correo electrónico"
+							style="text-align: left; width:25%">
+							<h:outputText value="#{cliente.correoElectronico}" />
+						</p:column>
+					</p:dataTable>
+				</p:tab>
+
+				<p:tab id="pagos" title="Datos económicos">
+					<p:dataTable var="pago" widgetVar="pagosTable" id="pagosTableID"
+						value="#{editFile.fileDetail.payments}"
+						style="width:1150px;height:500px" scrollHeight="100"
+						paginator="true" rows="12" paginatorPosition="bottom"
+						paginatorTemplate="Pagos asociados al expediente: #{editFile.fileDetail.payments.size()} {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+
+						<f:facet name="header">
+							<p:commandButton id="btnAdddPay" icon="ui-icon-plus"
+								oncomplete="PF('addPayment').show();" />
+							<p:tooltip id="toolTipFade" for="btnAdddPay"
+								value="Debe añadir clientes al expediente" position="top"
+								rendered="#{editFile.fileDetail.clients.size() lt 1}" />
+						</f:facet>
+						<p:column style="width:32px;text-align: center">
+							<p:commandButton icon="ui-icon-trash"
+								actionListener="#{editFile.deletePayment(pago)}"
+								update="@([id$=pagosTableID]) @([id$=summary])" />
+						</p:column>
+						<p:column headerText="Fecha" style="text-align: left; width:10%;">
+							<h:outputText value="#{pago.fecha}">
+								<f:convertDateTime pattern="dd MMM yyyy" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="Pagador"
+							style="text-align: left; width:30%;">
+							<h:outputText value="#{pago.payer}" />
+						</p:column>
+						<p:column headerText="Cantidad"
+							style="text-align: left; width:10%;">
+							<h:outputText value="#{pago.cantidad}">
+								<f:convertNumber pattern="#,##0.00 ¤" currencySymbol="€" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="Observaciones" style="text-align: left;">
+							<h:outputText value="#{pago.observaciones}" />
+						</p:column>
+					</p:dataTable>
+
+					<div style="margin-top: 10px; margin-right: 10px">
+						<div align="left">
+							<h:panelGrid columns="2" columnClasses="label,value" id="summary">
+								<h:outputText value="Presupuesto: " />
+								<p:inputText value="#{editFile.fileDetail.presupuesto}">
+									<f:convertNumber pattern="#,##0.00 ¤" currencySymbol="€" />
+								</p:inputText>
+								<h:outputText value="Pagos: " />
+								<h:outputText id="pagadoDetail"
+									value="#{editFile.fileSummary.pagado}">
+									<f:convertNumber pattern="#,##0.00 ¤" currencySymbol="€" />
+								</h:outputText>
+								<h:outputText id="morosoLabel" value="Moroso: "
+									style="#{editFile.fileSummary.moroso gt 0 ? 'color:red;' : 'color:balck;'}" />
+								<h:outputText id="morosoDetail"
+									value="#{editFile.fileSummary.moroso}"
+									style="#{editFile.fileSummary.moroso gt 0 ? 'color:red;' : 'color:balck;'}">
+									<f:convertNumber pattern="#,##0.00 ¤" currencySymbol="€" />
+								</h:outputText>
+							</h:panelGrid>
+						</div>
+					</div>
+				</p:tab>
+
+				<p:tab id="documents" title="Documentos">
+					<p:dataTable var="document" widgetVar="documentsTable"
+						id="documentsTableID" value="#{editFile.fileDetail.documents}"
+						style="width:1150px;height:450px" scrollHeight="100"
+						paginator="true" rows="10" paginatorPosition="bottom"
+						paginatorTemplate="Documentos asociados al expediente: #{editFile.fileDetail.documents.size()} {CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+
+						<p:column style="width:40px;text-align: center">
+							<p:commandButton icon="ui-icon-trash"
+								actionListener="#{editFile.deleteDocument(document)}"
+								update="@([id$=documentsTableID])" />
+						</p:column>
+						<p:column style="width:40px;text-align: center">
+							<p:commandButton icon="ui-icon-circle-arrow-s" ajax="false"
+								actionListener="#{editFile.prepDownload(document)}">
+								<p:fileDownload value="#{editFile.downloadFile}" />
+							</p:commandButton>
+						</p:column>
+						<p:column headerText="Descripcion" style="text-align: left;">
+							<h:outputText value="#{document.descripcion}">
+							</h:outputText>
+						</p:column>
+					</p:dataTable>
+					<p:fileUpload fileUploadListener="#{editFile.handleFileUpload}"
+						label="Seleccionar" cancelLabel="Cancelar"
+						uploadLabel="Subir todos" mode="advanced" dragDropSupport="true"
+						style="margin-top:15px;width:1150px"
+						update="@([id$=documentsTableID])" fileLimit="2" />
+				</p:tab>
+
+			</p:tabView>
+			<div style="margin-top: 15px;">
+				<div class=" col-xs-12 text-right">
+					<p:commandButton value="Guardar"
+						process="@this fileForm:asto fileForm:fileDetailPanel:obs fileForm:resp1 fileForm:resp2"
+						action="#{editFile.editAction}"
+						actionListener="#{editFile.attrListener}"
+						oncomplete="if (args &amp;&amp; !args.validationFailed) PF('fileEdit').hide()"
+						update="fileForm:msgs fileForm:resp1 fileForm:RespErrorMsg"
+						>
+						<f:attribute name="actionButton" value="save" />						
+					</p:commandButton>
+					<p:spacer width="1200" height="10" />
+					<p:commandButton value="Salir" oncomplete="PF('fileEdit').hide()" />
+				</div>
+			</div>
+		</h:form>
+	</p:dialog>
+
+	<p:dialog id="addClientID" widgetVar="addClient" modal="true"
+		header="Añadir cliente al expediente: #{(editFile.fileDetail.id > 0)? editFile.fileDetail.id : 'nuevo'}"
+		dynamic="true">
+		<h:form id="addClientForm">
+			<p:dataTable var="cliente" id="addClientTableID"
+				widgetVar="addClientTable" style="width:1200px;"
+				value="#{editFile.allClients}" scrollable="true" rows="10"
+				paginator="true" paginatorPosition="bottom"
+				paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				rowsPerPageTemplate="10,15,20"
+				emptyMessage="No hay clientes que cumplan el filtro" lazy="true"
+				sortBy="#{cliente.apellidos}" sortOrder="ASCENDING">
+				<p:column style="width:5%;text-align: center">
+					<p:commandButton icon="ui-icon-plus"
+						actionListener="#{editFile.addClient(cliente)}"
+						update="@([id$=clientsTable]) @([id$=totalClients])">
+					</p:commandButton>
+				</p:column>
+				<p:column headerText="Apellidos" filterBy="#{cliente.apellidos}"
+					filterMatchMode="exact" filterStyle="width:95%;"
+					sortBy="#{cliente.apellidos}" style="text-align: left; width:35%;">
+					<h:outputText value="#{cliente.apellidos}" />
+				</p:column>
+				<p:column headerText="Nombre" filterBy="#{cliente.nombre}"
+					filterMatchMode="exact" filterStyle="width:95%;"
+					sortBy="#{cliente.nombre}" style="text-align: left; width:15%;">
+					<h:outputText value="#{cliente.nombre}" />
+				</p:column>
+				<p:column headerText="Teléfono" style="text-align: left; width:10%;">
+					<h:outputText value="#{cliente.telefono}" />
+				</p:column>
+				<p:column headerText="Teléfono 2"
+					style="text-align: left; width:10%;">
+					<h:outputText value="#{cliente.telefono2}" />
+				</p:column>
+				<p:column headerText="Correo electrónico"
+					style="text-align: left; width:25%">
+					<h:outputText value="#{cliente.correoElectronico}" />
+				</p:column>
+			</p:dataTable>
+		</h:form>
+	</p:dialog>
+
+	<p:dialog id="uploadDialog" widgetVar="uploadDialog">
+		<h:form id="fileUploadForm">
+			<p:fileUpload value="#{editFile.file}" mode="simple"
+				skinSimple="true" />
+			<p:commandButton value="Submit" ajax="false"
+				actionListener="#{editFile.upload}" />
+		</h:form>
+	</p:dialog>
+
+	<p:dialog id="addPaymentID" widgetVar="addPayment" modal="true"
+		header="Introduzca cantidades" dynamic="true">
+		<h:form>
+			<h:panelGrid columns="2" id="displayPagos"
+				columnClasses="label,value">
+				<h:outputText value="Cantidad" />
+				<p:inputText id="cantidad" value="#{editFile.newPayment.cantidad}"
+					style="width:80px;text-align: left">
+					<f:convertNumber pattern="#,##0.00 ¤" currencySymbol="€" />
+				</p:inputText>
+				<h:outputText value="Observaciones" />
+				<p:inputTextarea rows="4" cols="220"
+					value="#{editFile.newPayment.observaciones}" id="paymentObs" />
+			</h:panelGrid>
+			<p:commandButton process="@this cantidad paymentObs"
+				style="margin-top:15px;" icon="ui-icon-plus"
+				actionListener="#{editFile.addPayment()}"
+				update="@([id$=pagosTableID]) @([id$=summary]) @([id$=btnAdddPay])" />
+		</h:form>
+	</p:dialog>
+
+	<p:dialog widgetVar="eventDialog" header="Event Details"
+		showEffect="clip" hideEffect="clip" closable="false" modal="true">
+		<h:form id="formEvent">
+		
+			<h:panelGrid id="eventDetails" columns="2">
+				<p:outputLabel for="title" value="Título:" />
+				<p:inputText id="title" value="#{editFile.event.title}"/>
+				
+				<p:outputLabel for="desc" value="Descripción:" />
+            	<p:inputTextarea id="desc" value="#{editFile.event.description}"/>					
+
+				<p:outputLabel for="from" value="Desde:" style="margin-top: 10px;"/>								
+				<p:calendar id="from" value="#{editFile.event.startDate}"
+					timeZone="GMT+2" pattern="dd/MM/yyyy HH:mm" style="margin-top: 10px;"/>
+
+				<p:outputLabel for="to" value="Hasta:" style="margin-top: 10px;"/>
+				<p:calendar id="to" value="#{editFile.event.endDate}"
+					timeZone="GMT+2" pattern="dd/MM/yyyy HH:mm" style="margin-top: 10px;"/>
+					
+				<p:outputLabel for="sendMailToC" value="Enviar mail a clientes" style="margin-top: 10px;"/>
+				<p:selectBooleanCheckbox id="sendMailToC" value="#{editFile.event.sendMailToClients}" />
+				
+				<p:outputLabel for="sendMailToR" value="Enviar mail a responsables" style="margin-top: 10px;"/>
+				<p:selectBooleanCheckbox id="sendMailToR" value="#{editFile.event.sendMailToResponsibles}" />				
+
+				<p:commandButton id="addButton" value="Save"
+					actionListener="#{editFile.addEvent}"
+					oncomplete="PF('eventDialog').hide();" update="@([id$=schedule]) @([id$=timeline])" style="margin-top: 10px;"/>
+				<p:commandButton value="Cancelar"
+					onclick="PF('eventDialog').hide();" style="margin-top: 10px;"/>
+					
+				<p:commandButton icon="ui-icon-trash"
+					onclick="PF('eventDialog').hide();" actionListener="#{editFile.deleteEvent}" update="@([id$=schedule]) @([id$=timeline])"/>					
+			</h:panelGrid>
+		</h:form>
+	</p:dialog>
+</ui:composition>

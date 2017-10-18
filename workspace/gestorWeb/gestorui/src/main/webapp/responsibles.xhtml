@@ -1,0 +1,229 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/facelets/templates/defaultLayout.xhtml">
+	<ui:define name="title">
+		<h:outputText value="Responsibles" />
+	</ui:define>
+	<ui:define name="content">
+
+		<h:form id="theForm">
+			<p:growl id="msgs" showDetail="true" autoUpdate="true" />
+			<h:panelGrid columns="2" cellpadding="5" styleClass="panelGrid"
+				style="border:none;margin:0 auto;width:1200px;">
+				<p:dataTable var="responsible" widgetVar="responsiblesTable"
+					id="responsiblesTable" value="#{responsiblesView.responsibles}"
+					emptyMessage="No hay responsibles que cumplan el filtro"
+					style="table-layout: fixed;width:700px;" selectionMode="single"
+					selection="#{responsiblesView.selectedResponsible}"
+					rowKey="#{responsible.id}">
+					<f:facet name="header">
+							Lista de responsibles
+						<p:commandButton action="#{responsiblesView.editAction}"
+							actionListener="#{responsiblesView.attrListener}"
+							oncomplete="PF('responsibleDlg').show();" icon="ui-icon-plus"
+							update=":responsibleDlg">
+							<p:resetInput target="responsibleDlg" />
+							<f:attribute name="actionButton" value="initCreate" />
+						</p:commandButton>
+					</f:facet>
+					<p:column style="width:5px;text-align: center">
+						<p:commandButton 
+							action="#{responsiblesView.editAction}"
+							actionListener="#{responsiblesView.attrListener}"
+							oncomplete="PF('responsibleDlg').show();" icon="ui-icon-search"
+							update=":responsibleDlg">
+							<p:resetInput target="responsibleDlg" />
+							<f:attribute name="actionButton" value="update" />
+							<f:setPropertyActionListener value="#{responsible}"
+								target="#{responsiblesView.selectedResponsible}" />
+						</p:commandButton>
+					</p:column>
+					<p:column style="width:5px;text-align: center">
+	 					<p:commandButton oncomplete="PF('deleteRespDlg').show();" update=":deleteRespDialog"  icon="ui-icon-trash">
+	                		<f:setPropertyActionListener value="#{responsible}" target="#{responsiblesView.selectedResponsible}" />
+	            		</p:commandButton>
+					</p:column>					
+					<p:column headerText="Nombre"
+						style="text-align: left; width:50px;">
+						<h:outputText value="#{responsible.nombre}" />
+					</p:column>
+					<p:column headerText="Correo"
+						style="text-align: left; width:150px;">
+						<h:outputText value="#{responsible.email}" />
+					</p:column>					
+				</p:dataTable>
+
+				<p:tabView id="files" style="width:1050px;">
+					<p:tab title="Informes" id="reportsTab">
+						<h:panelGrid columns="2" style="margin-bottom:10px"
+							cellpadding="2">
+							<p:selectBooleanCheckbox id="closed" itemLabel="Incluir cerrados" value="#{responsiblesView.filesDataModel.includeClosed}">
+							</p:selectBooleanCheckbox>
+							<p:selectBooleanCheckbox id="resp2" itemLabel="Segundo responsible" value="#{responsiblesView.filesDataModel.includeResponsible2}">
+							</p:selectBooleanCheckbox>
+							<p:commandButton process=":theForm:responsiblesTable closed resp2"
+								update=":theForm:files:fileTab" icon="ui-icon-search"
+								value="Filtrar" />
+						</h:panelGrid>
+						<h:commandLink>
+							<h:graphicImage value="resources/images/icon_excel.png" />
+							<p:dataExporter type="xls" target="fileTab"
+								fileName="expedientes" />
+						</h:commandLink>
+
+						<p:commandButton image="pdf" actionListener="#{responsiblesView.preparePrint}" ajax="false">
+							<p:fileDownload value="#{responsiblesView.print()}" />
+						</p:commandButton>
+						
+						<p:dataTable var="file"
+								id="fileTab"
+								value="#{responsiblesView.filesDataModel}"
+								emptyMessage="No hay registros ¿Ha seleccionado un responsable?"
+								scrollRows="20"
+								liveScroll="true"
+								scrollHeight="500"
+								lazy="true"
+								scrollable="true"
+								style="width:1000px;"
+								sortBy="#{file.apellidos}"
+								sortOrder="ASCENDING"
+								>
+								<p:column style="width:32px;text-align: center">
+									<p:commandButton 
+										action="#{editFile.editAction}"
+										actionListener="#{editFile.attrListener}"
+										oncomplete="PF('clientEdit').hide();PF('fileEdit').show();"
+										icon="ui-icon-search"
+										update=":fileDetailID fileTab"
+										>
+										<p:resetInput target="fileDetailID"/>
+										<f:attribute name="actionButton" value="update" />
+										<f:setPropertyActionListener value="#{file}"
+											target="#{editFile.respFile}" />						
+									</p:commandButton>
+								</p:column>								
+								<p:column headerText="ID" filterBy="#{file.expId}" filterMatchMode="exact" filterStyle="width:95%;" style="text-align: left; width:40px;">
+								   <h:outputText value="#{file.expId}" />
+								</p:column>
+								<p:column headerText="Apellido" filterBy="#{file.apellidos}" filterMatchMode="exact" filterStyle="width:95%;" style="text-align: left; width:150px;">
+								   <h:outputText value="#{file.apellidos}" />
+								</p:column>
+								<p:column headerText="Nombre" filterBy="#{file.nombre}" filterMatchMode="exact" filterStyle="width:95%;" style="text-align: left; width:100px;">
+								   <h:outputText value="#{file.nombre}" />
+								</p:column>
+								<p:column headerText="Asunto" filterMatchMode="exact" style="text-align: left; width:150px;">
+								   <h:outputText value="#{file.asunto}" />
+								</p:column>								
+								<p:column headerText="Teléfono" style="text-align: left; width:80px;">
+								   <h:outputText value="#{file.telefono}" />
+								</p:column>
+								<p:column headerText="Pagado" style="text-align: left; width:60px;">
+								   <h:outputText value="#{file.pagado}">
+								     <f:convertNumber pattern="#,##0.00 ¤" currencySymbol="€" />
+								   </h:outputText>
+								</p:column>
+								<p:column headerText="Presupuesto" style="text-align: left; width:60px;">
+								   <h:outputText value="#{file.presupuesto}">
+								     <f:convertNumber pattern="#,##0.00 ¤" currencySymbol="€" />
+								   </h:outputText>
+								</p:column>								
+								<p:column headerText="RIP" style="text-align: left; width:20px;">
+								   <p:selectBooleanCheckbox value="#{file.cerrado}" style="text-align: center;" disabled="true"/>
+								</p:column>								
+						</p:dataTable>
+
+						<p:blockUI block="fileTab" trigger="fileTab">
+							LOADING<br/>
+							<p:graphicImage name="ajax-loader.gif" />
+						</p:blockUI>
+						
+					</p:tab>
+					<p:tab title="Graficos">
+						<p:outputLabel for="graph" value="Gráficos: " />
+						<p:selectOneMenu id="graph" value="#{responsiblesView.graph}">
+							<f:selectItems value="#{responsiblesView.graphs}" />
+						</p:selectOneMenu>						
+						<p:chart id="chart" type="bar" model="#{responsiblesView.barModel}" style="height:500px;width:1000px"/>
+						<p:commandButton value="Construir gráfico" action="#{responsiblesView.buildChart}"
+							update=":theForm:files" />						
+						<p:blockUI block="chart" trigger="chart">
+							LOADING<br />
+							<p:graphicImage name="images/ajax-loader.gif"/>
+						</p:blockUI>
+					</p:tab>
+					
+				<p:tab id="timelineTab" title="Eventos">
+					<p:timeline id="timeline" value="#{responsiblesView.timelineModel}" height="250px" 
+					        selectable="true" 
+					        zoomable="true" 
+					        moveable="true" 
+					        stackEvents="trie" 
+					        axisOnTop="false"              
+					        eventStyle="box" 
+					        showCurrentTime="true" 
+					        showNavigation="false">
+					        
+					        <p:ajax event="select" listener="#{responsiblesView.onTimelineEventSelect}"/>
+					</p:timeline> 			
+					<p:commandButton update="timeline" value="Ver" />		
+				</p:tab>					
+					
+				</p:tabView>
+
+			</h:panelGrid>
+		</h:form>
+
+		<p:dialog
+			header="Responsable: #{responsiblesView.selectedResponsible.id}"
+			modal="true" showEffect="clip" widgetVar="responsibleDlg"
+			resizable="false" id="responsibleDlg" closable="false">
+			
+			<p:ajax event="close" update="@([id$=responsiblesTable])" />
+			
+			<h:form id="editResponsible">
+				<h:panelGrid columns="2" style="margin-bottom:10px">
+					<p:outputLabel for="name" value="Nombre: " />
+					<p:inputText value="#{responsiblesView.selectedResponsible.nombre}" id="name"
+						style="width:150px;text-align: left" />
+					<p:outputLabel for="email" value="Correo: " />
+					<p:inputText value="#{responsiblesView.selectedResponsible.email}" id="email"
+						style="width:150px;text-align: left" />
+				</h:panelGrid>					
+				<div style="margin-top:15px;">
+					<div class=" col-xs-12 text-right">	
+					
+						<p:commandButton 
+							process="@this name email"
+							value="Guardar"
+							action="#{responsiblesView.editAction}"
+							actionListener="#{responsiblesView.attrListener}"
+							oncomplete="if (args &amp;&amp; !args.validationFailed)  PF('responsibleDlg').hide();"
+							update=":theForm:responsiblesTable :theForm:msgs">
+							<f:attribute name="actionButton" value="save" />
+						</p:commandButton>
+							
+						<p:commandButton oncomplete="PF('responsibleDlg').hide();" value="Salir" />
+					</div>
+				</div>
+			</h:form>
+		</p:dialog>
+		
+		<p:confirmDialog widgetVar="deleteRespDlg" id="deleteRespDialog"
+			header="Delete" message="¿Eliminar el responsable #{responsiblesView.selectedResponsible.nombre}?" width="400"
+			showEffect="clip" modal="true" closable="false" severity="alert">
+			<h:panelGroup layout="block" style="text-align: right">
+				<p:commandButton value="Yes" action="#{responsiblesView.deleteResponsible}"
+					oncomplete="PF('deleteRespDlg').hide();" update="theForm:responsiblesTable theForm:msgs" />
+				<p:commandButton value="No"
+					oncomplete="PF('deleteRespDlg').hide();" />
+			</h:panelGroup>
+		</p:confirmDialog>			
+		
+		<ui:include src="editFile.xhtml"/>
+		<ui:include src="editClient.xhtml"/>
+				
+	</ui:define>
+</ui:composition>

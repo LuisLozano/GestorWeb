@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Licensed to the Apache Software Foundation (ASF) under one or more contributor 
+	license agreements. See the NOTICE file distributed with this work for additional 
+	information regarding copyright ownership. The ASF licenses this file to 
+	You under the Apache License, Version 2.0 (the "License"); you may not use 
+	this file except in compliance with the License. You may obtain a copy of 
+	the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required 
+	by applicable law or agreed to in writing, software distributed under the 
+	License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS 
+	OF ANY KIND, either express or implied. See the License for the specific 
+	language governing permissions and limitations under the License. -->
+<features name="${project.artifactId}-${project.version}"
+	xmlns="http://karaf.apache.org/xmlns/features/v1.0.0">
+
+	<feature name='${feature.name}' description='${project.name}'
+		version='${project.version}'>
+		<details>${project.description}</details>
+		<!-- <config>foo=bar</config> -->
+
+		<feature version="6.4.1">jasperreports</feature>
+		<feature>scheduler</feature>
+		<bundle>mvn:es.salazaryasociados/gestorweb_model/${gestorweb.model.version}
+		</bundle>
+		<bundle>mvn:es.salazaryasociados/gestorweb_control/${gestorweb.control.version}
+		</bundle>
+		<bundle>mvn:es.salazaryasociados/services.data.api/${gestorweb.services.data.api}
+		</bundle>
+		<bundle start-level="100">mvn:es.salazaryasociados/services.data.impl/${gestorweb.services.data.impl}
+		</bundle>
+
+		<bundle>mvn:org.primefaces/primefaces/6.1</bundle>
+		<bundle>mvn:es.salazaryasociados/gestorui/${gestorweb.gestorui}/war
+		</bundle>
+		<bundle>mvn:es.salazaryasociados/commands/0.0.1-SNAPSHOT</bundle>
+		<bundle>mvn:org.quartz-scheduler/quartz/2.2.1</bundle>
+		<bundle>wrap:mvn:c3p0/c3p0/0.9.1.1</bundle>
+	</feature>
+
+	<feature name='jasperreports' description='jasperreports'
+		version='6.4.1'>
+		<details>Jasperreports</details>
+		<bundle>wrap:mvn:org.codehaus.castor/castor-core/1.3.3</bundle>
+		<bundle>wrap:mvn:org.codehaus.castor/castor-xml/1.3.3</bundle>
+		<bundle>mvn:commons-beanutils/commons-beanutils/1.9.3</bundle>
+		<bundle>mvn:commons-digester/commons-digester/2.1</bundle>
+		<bundle>wrap:mvn:com.google.zxing/core/3.2.1</bundle>
+		<bundle>mvn:org.eclipse.jdt.core.compiler/ecj/4.3.1</bundle>
+		<bundle>mvn:com.ibm.icu/icu4j/57.1</bundle>
+		<bundle>wrap:mvn:com.lowagie/itext/2.1.7</bundle>
+		<bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/2.1.4</bundle>
+		<bundle>mvn:com.fasterxml.jackson.core/jackson-core/2.1.4</bundle>
+		<bundle>mvn:com.fasterxml.jackson.core/jackson-databind/2.1.4</bundle>
+		<bundle>wrap:mvn:jakarta-regexp/jakarta-regexp/1.4</bundle>
+		<bundle>mvn:net.sf.jasperreports/jasperreports/6.4.1</bundle>
+		<bundle>wrap:mvn:org.jfree/jcommon/1.0.23</bundle>
+		<bundle>wrap:mvn:org.jfree/jfreechart/1.0.19</bundle>
+		<bundle>wrap:mvn:org.apache.lucene/lucene-analyzers-common/4.5.1</bundle>
+		<bundle>wrap:mvn:org.apache.lucene/lucene-core/4.5.1</bundle>
+		<bundle>wrap:mvn:org.apache.lucene/lucene-queries/4.5.1</bundle>
+		<bundle>wrap:mvn:org.apache.lucene/lucene-queryparser/4.5.1</bundle>
+		<bundle>wrap:mvn:org.apache.lucene/lucene-sandbox/4.5.1</bundle>
+		<!-- >bundle>wrap:mvn:org.olap4j/olap4j/0.9.7.309-JS-3</bundle-->
+	</feature>
+</features>

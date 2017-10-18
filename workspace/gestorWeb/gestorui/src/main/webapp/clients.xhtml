@@ -1,0 +1,104 @@
+<ui:composition
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" 
+	template="/WEB-INF/facelets/templates/defaultLayout.xhtml">
+	<ui:define name="title">
+		<h:outputText value="Clientes" />
+	</ui:define>
+	<ui:define name="content">
+	    <h:form id="clientsListForm">		
+	    	<p:growl id="msgs" showDetail="true" />	
+		    <p:dataTable var="client" widgetVar="clientsTable" id="clientsTable" value="#{clientsListView.dataModel}" rows="20"
+		                         paginator="true" paginatorPosition="bottom"
+		                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+		                         rowsPerPageTemplate="20,50,70"
+		                         emptyMessage="No hay clientes que cumplan el filtro"
+		                         lazy="true"
+		                         style="table-layout: fixed"
+		                         sortBy="#{client.apellidos}"
+		                         sortOrder="ASCENDING"
+		                         >
+		        <f:facet name="header">
+						Lista de clientes
+						<p:commandButton 
+							action="#{editClient.editAction}"
+							actionListener="#{editClient.attrListener}"
+							oncomplete="PF('clientEdit').show();"
+							icon="ui-icon-plus"
+							update=":clientDetailID"
+							>
+							<p:resetInput target="clientDetailID"/>
+							<f:attribute name="actionButton" value="initCreate" />
+						</p:commandButton>
+				</f:facet>				
+				
+				<p:column style="width:32px;text-align: center">
+					<p:commandButton 
+						action="#{editClient.editAction}"
+						actionListener="#{editClient.attrListener}"
+						oncomplete="PF('clientEdit').show();"
+						icon="ui-icon-search"
+						update=":clientDetailID"
+						>
+						<p:resetInput target="clientDetailID"/>
+						<f:attribute name="actionButton" value="update" />
+						<f:setPropertyActionListener value="#{client}"
+							target="#{editClient.clientSummary}" />						
+					</p:commandButton>				
+				</p:column>
+				
+				<p:column style="width:32px;text-align: center">
+ 					<p:commandButton oncomplete="PF('deleteDlg').show();" update=":deleteDialog"  icon="ui-icon-trash">
+ 						<f:setPropertyActionListener value="#{client.id}" target="#{clientsListView.selectedClient}" />
+            		</p:commandButton>
+				</p:column>				
+				
+				<p:column headerText="Nombre" style="text-align: left; width:150px;" sortBy="#{client.nombre}" filterBy="#{client.nombre}" filterMatchMode="exact" filterStyle="width:95%;">
+					<h:outputText value="#{client.nombre}"/>
+				</p:column>												
+				<p:column headerText="Apellidos" style="text-align: left; width:300px;" sortBy="#{client.apellidos}" filterBy="#{client.apellidos}" filterMatchMode="exact" filterStyle="width:95%;">
+					<h:outputText value="#{client.apellidos}" />
+				</p:column>																
+				<p:column headerText="DNI" style="text-align: left; width:90px;" sortBy="#{client.dni}" filterBy="#{client.dni}" filterMatchMode="exact" filterStyle="width:95%;">
+					<h:outputText value="#{client.dni}" />
+				</p:column>							
+				<p:column headerText="Teléfono" style="text-align: left; width:90px;">
+					<h:outputText value="#{client.telefono}" />
+				</p:column>													
+				<p:column headerText="Dirección" style="text-align: left;">
+					<h:outputText value="#{client.direccion}" />
+				</p:column>												
+				<p:column headerText="Población" style="text-align: left;">
+					<h:outputText value="#{client.poblacion}" />
+				</p:column>																
+				<p:column headerText="Correo electrónico" style="text-align: left;">
+					<h:outputText value="#{client.correoElectronico}" />
+				</p:column>																	
+				
+		    </p:dataTable>   
+
+			<p:blockUI block="clientsTable" trigger="clientsTable">
+				LOADING<br />
+				<p:graphicImage name="images/ajax-loader.gif"/>
+			</p:blockUI>
+		</h:form>
+		
+		<p:confirmDialog widgetVar="deleteDlg" id="deleteDialog"
+			header="Delete" message="¿Eliminar el cliente #{clientsListView.selectedClient}?" width="400"
+			showEffect="clip" modal="true" closable="false" severity="alert">
+			<h:panelGroup layout="block" style="text-align: right">
+				<p:commandButton value="Yes" action="#{clientsListView.deleteClient}"
+					oncomplete="PF('deleteDlg').hide();" update=":clientsListForm:msgs :clientsListForm:clientsTable" />
+				<p:commandButton value="No"
+					oncomplete="PF('deleteDlg').hide();" />
+			</h:panelGroup>
+		</p:confirmDialog>	
+		
+		<ui:include src="editFile.xhtml"/>
+		<ui:include src="editClient.xhtml"/>
+					
+	</ui:define>
+</ui:composition>

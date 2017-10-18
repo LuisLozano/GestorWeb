@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+	<h:form id="menu">
+		<p:menubar style="margin-bottom:15px;">
+			<p:menuitem value="Expedientes" url="expedientes.xhtml" icon="ui-icon-document"/>
+			<p:menuitem id="clients" value="Clientes" url="clients.xhtml" icon="ui-icon-person"/>
+			<p:menuitem id="responsibles" value="Responsables" url="responsibles.xhtml" icon="ui-icon-star"/>
+			<p:menuitem id="configuration" value="Configuración" url="configuration.xhtml" icon="ui-icon-gear"/>
+		</p:menubar>
+	</h:form>
+</ui:composition>
+</html>
