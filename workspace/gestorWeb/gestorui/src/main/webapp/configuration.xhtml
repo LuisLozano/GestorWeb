@@ -11,34 +11,148 @@
 		<h:form id="configurationForm">
 			<p:growl id="msgs" showDetail="true" autoUpdate="true" />
 
-			<p:tabView>
+			<p:tabView id="panel">
 				<p:tab title="Asuntos">
-					<p:dataTable var="subject" widgetVar="subjectsTable"
-						id="subjectsTableID" value="#{configurationBean.subjects}"
-						style="width:1200px;" scrollHeight="500"
-						emptyMessage="No hay registros" scrollRows="20" liveScroll="true"
-						lazy="true" scrollable="true" sortBy="#{asunto}"
-						filterBy="#{asunto}" sortOrder="ASCENDING"						
-						selection="#{configurationBean.selectedSubjects}"
-						rowKey="#{subject.toString()}">
+					<h:panelGrid id="panelAsuntos" columns="1" cellpadding="8"
+						layout="grid">
+						<p:dataTable var="fileSubject" widgetVar="subjectsTable"
+							id="subjectsTableID" value="#{configurationBean.subjects}"
+							style="width:1200px;" scrollHeight="500"
+							emptyMessage="No hay registros" scrollRows="20" liveScroll="true"
+							lazy="true" scrollable="true" sortBy="#{asunto}"
+							filterBy="#{asunto}" sortOrder="ASCENDING"
+							selection="#{configurationBean.selectedSubjects}"
+							rowKey="#{fileSubject.id}">
 
-						<p:column selectionMode="multiple" style="width:16px;text-align:center"/>
-						
-						<p:column headerText="Asunto" style="text-align: left; width:95%;"
-							filterBy="#{asunto}" filterStyle="width:95%;">
-							<h:outputText value="#{subject}" />
-						</p:column>
-					</p:dataTable>
+							<p:column selectionMode="multiple"
+								style="width:16px;text-align:center" />
 
-				<h:panelGrid columns="2" columnClasses="label,value" border = "1" style="margin-top:15px;">
-				
-					<h:outputText value="Nuevo asunto"/> 
-					<p:inputText id="newSubject" value="#{configurationBean.newSubject}" style="width:1000px;text-align: left"/>
-					<p:commandButton process="subjectsTableID newSubject"
-						icon="ui-icon-search" value="Unificar"
-						action="#{configurationBean.unify}" 
-						update="@([id$=subjectsTableID]) @([id$=newSubject])"/>
-				</h:panelGrid>
+							<p:column headerText="Asunto"
+								style="text-align: left; width:95%;" filterBy="#{asunto}"
+								filterStyle="width:95%;">
+								<h:outputText value="#{fileSubject.asunto}" />
+							</p:column>
+						</p:dataTable>
+
+						<h:panelGrid columns="3" columnClasses="label,value" border="1"
+							style="margin-top:15px;">
+
+							<p:commandButton process="subjectsTableID" id="btnSuggestSubject"
+								icon="ui-icon-search" value="Sugerir"
+								action="#{configurationBean.suggestSubject}"
+								update="@([id$=subjectsTableID]) subjectSuggestion" />
+							<p:outputLabel
+								value="Sugerencia: #{configurationBean.subjectSuggestion}"
+								id="subjectSuggestion" />
+							<p:commandButton process="subjectsTableID"
+								id="btnClearSubjectSuggestion" icon="ui-icon-search"
+								value="Limpiar Sugerencia"
+								action="#{configurationBean.clearSubjectSuggestion}"
+								update="@([id$=subjectsTableID]) subjectSuggestion" />
+
+							<h:outputText value="Nuevo asunto" />
+							<p:inputText id="newSubject"
+								value="#{configurationBean.newSubject}"
+								style="width:1000px;text-align: left" />
+							<p:commandButton process="subjectsTableID newSubject"
+								icon="ui-icon-search" value="Unificar"
+								action="#{configurationBean.unifySubjects}"
+								update="@([id$=subjectsTableID]) @([id$=newSubject])" />
+						</h:panelGrid>
+
+						<p:blockUI block="panelAsuntos" trigger="btnSuggestSubject">
+							LOADING<br />
+							<p:graphicImage name="images/ajax-loader.gif" />
+						</p:blockUI>
+					</h:panelGrid>
+				</p:tab>
+				<p:tab title="Clientes">
+					<h:panelGrid id="panelClientes" columns="2" cellpadding="8"
+						layout="grid">
+						<p:dataTable var="client" widgetVar="clientsTable"
+							id="clientsTable" value="#{configurationBean.clientsDataModel1}"
+							rows="20" paginator="true" paginatorPosition="bottom"
+							paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+							rowsPerPageTemplate="20,50,70"
+							emptyMessage="No hay clientes que cumplan el filtro" lazy="true"
+							style="table-layout: fixed" sortBy="#{client.apellidos}"
+							selection="#{configurationBean.selectedClient1}"
+							rowKey="#{client.id}" sortOrder="ASCENDING"
+							selectionMode="single">
+
+							<p:column headerText="Nombre"
+								style="text-align: left; width:150px;" sortBy="#{client.nombre}"
+								filterBy="#{client.nombre}" filterMatchMode="exact"
+								filterStyle="width:95%;">
+								<h:outputText value="#{client.nombre}" />
+							</p:column>
+							<p:column headerText="Apellidos"
+								style="text-align: left; width:300px;"
+								sortBy="#{client.apellidos}" filterBy="#{client.apellidos}"
+								filterMatchMode="exact" filterStyle="width:95%;">
+								<h:outputText value="#{client.apellidos}" />
+							</p:column>
+							<p:column headerText="DNI" style="text-align: left; width:90px;"
+								sortBy="#{client.dni}" filterBy="#{client.dni}"
+								filterMatchMode="exact" filterStyle="width:95%;">
+								<h:outputText value="#{client.dni}" />
+							</p:column>
+						</p:dataTable>
+
+						<p:dataTable var="client" widgetVar="clientsTable2"
+							id="clientsTable2" value="#{configurationBean.clientsDataModel2}"
+							rows="20" paginator="true" paginatorPosition="bottom"
+							paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+							rowsPerPageTemplate="20,50,70"
+							emptyMessage="No hay clientes que cumplan el filtro" lazy="true"
+							style="table-layout: fixed" sortBy="#{client.apellidos}"
+							selection="#{configurationBean.selectedClient2}"
+							rowKey="#{client.id}" sortOrder="ASCENDING"
+							selectionMode="single">
+
+							<p:column headerText="Nombre"
+								style="text-align: left; width:150px;" sortBy="#{client.nombre}"
+								filterBy="#{client.nombre}" filterMatchMode="exact"
+								filterStyle="width:95%;">
+								<h:outputText value="#{client.nombre}" />
+							</p:column>
+							<p:column headerText="Apellidos"
+								style="text-align: left; width:300px;"
+								sortBy="#{client.apellidos}" filterBy="#{client.apellidos}"
+								filterMatchMode="exact" filterStyle="width:95%;">
+								<h:outputText value="#{client.apellidos}" />
+							</p:column>
+							<p:column headerText="DNI" style="text-align: left; width:90px;"
+								sortBy="#{client.dni}" filterBy="#{client.dni}"
+								filterMatchMode="exact" filterStyle="width:95%;">
+								<h:outputText value="#{client.dni}" />
+							</p:column>
+						</p:dataTable>
+
+						<h:panelGrid columns="3">
+							<p:commandButton process="clientsTable clientsTable2"
+								id="btnSuggestClient" icon="ui-icon-search" value="Sugerir"
+								action="#{configurationBean.suggestClient}"
+								update="@([id$=clientsTable]) @([id$=clientsTable2])" />
+
+							<p:commandButton process="clientsTable clientsTable2" id="btn2"
+								icon="ui-icon-closethick" value="Limpiar Sugerencia"
+								action="#{configurationBean.clearClientSuggestion}"
+								update="@([id$=clientsTable]) @([id$=clientsTable2])" />
+
+							<p:commandButton process="clientsTable clientsTable2" id="btn3"
+								icon="ui-icon-transferthick-e-w" value="Unificar"
+								action="#{configurationBean.unifyClients}"
+								update="@([id$=clientsTable]) @([id$=clientsTable2])" />
+						</h:panelGrid>
+					</h:panelGrid>
+
+					<p:blockUI block="panelClientes" trigger="btnSuggestClient">
+							LOADING<br />
+						<p:graphicImage name="images/ajax-loader.gif" />
+					</p:blockUI>
+
+
 				</p:tab>
 			</p:tabView>
 		</h:form>

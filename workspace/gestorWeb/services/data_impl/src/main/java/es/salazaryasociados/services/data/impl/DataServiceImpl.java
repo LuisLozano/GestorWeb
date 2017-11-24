@@ -8,6 +8,10 @@ import java.util.Map;
 
 import javax.validation.ValidationException;
 
+import org.apache.commons.text.similarity.LevenshteinDistance;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import es.salazaryasociados.control.ClientDao;
 import es.salazaryasociados.control.DocumentoDao;
 import es.salazaryasociados.control.EventoDao;
@@ -139,7 +143,9 @@ public class DataServiceImpl implements IDataService {
 	public List<ResponsibleFilesDTO> getAllResponsibleFiles(int pageSize, int first, Map<String, Object> params,
 			String order, boolean desc) throws DataServiceException {
 
-		Map<String, Object> filterAux = new HashMap<String, Object>(params);
+		Map<String, Object> filterAux = new HashMap<String, Object>();
+		if (params != null)
+			filterAux.putAll(params);
 		List<ResponsibleFilesDTO> result = null;
 		
 		try {
@@ -191,9 +197,10 @@ public class DataServiceImpl implements IDataService {
 	public long getResponsibeFilesCount(Map<String, Object> params) throws DataServiceException {
 		
 		try {
-			Map<String, Object> filterAux = new HashMap<String, Object>(params);
+			Map<String, Object> filterAux = new HashMap<String, Object>();
 			if (params != null)
 			{
+				filterAux.putAll(params);
 				if (params.containsKey("expId")) {
 					ListadoExpResp exp = respFileDao.getById(Integer.parseInt((String) params.get("expId")));
 					if (exp != null) {
@@ -280,6 +287,7 @@ public class DataServiceImpl implements IDataService {
 			else {
 				int i = (int)fileDao.getLastFileNumber();
 				file.setId(i+1);
+				file.setFechaApertura(new Date());
 				result = fileDao.persist(fileConverter.getEntity(file)).getId();
 			}
 		}catch(ValidationException e) {
@@ -305,6 +313,15 @@ public class DataServiceImpl implements IDataService {
 	}
 	
 	@Override
+	public List<FileSummaryDTO> getFilesGroupBy(int pageSize, int first, final Map<String, Object> params, String order, boolean desc, String groupBy) throws DataServiceException {
+		try {
+			return fileSummaryConverter.getDtoList(fileDao.getFilesGroupBy(pageSize, first, params, order, desc, groupBy));
+		}catch(Exception e) {
+			throw new DataServiceException(GestorErrors.PERSISTENCE_EXCEPTION, e);
+		}
+	}
+
+	@Override
 	public List<String> getSubjects(int pageSize, int first, final Map<String, Object> params, String order, boolean desc) throws DataServiceException {
 		try {
 			return fileDao.getSubjects(pageSize, first, params, order, desc);
@@ -314,16 +331,12 @@ public class DataServiceImpl implements IDataService {
 	}
 	
 	@Override
-	public long getSubjectsCount(final Map<String, Object> params) throws DataServiceException {
-		try {
-			return fileDao.getSubjectsCount(params);
-		}catch(Exception e) {
-			throw new DataServiceException(GestorErrors.PERSISTENCE_EXCEPTION, e);
-		}		
+	public long getlFilesCount(Map<String, Object> filters, String groupBy) {
+		return fileDao.getCount(filters, groupBy);
 	}
-	
+		
 	@Override
-	public void unify(List<String> selectedSubjects, String newSubject) throws DataServiceException {
+	public void unifySubjects(List<String> selectedSubjects, String newSubject) throws DataServiceException {
 		try {
 		fileDao.unify(selectedSubjects, newSubject);
 		}catch(Exception e) {
@@ -493,6 +506,131 @@ public class DataServiceImpl implements IDataService {
 	}	
 	
 	@Override
+	public void unifyClients(int clientID1, int clientID2) throws DataServiceException {
+		if (clientID1 == clientID2) {
+			throw new DataServiceException(GestorErrors.UNIFY_SAME_CLIENT, "Deben seleccionarse dos clientes distintos");
+		}
+		
+		try {
+			Cliente client1 = clientDao.getById(clientID1);
+			Cliente client2 = clientDao.getById(clientID2);
+			
+			if (client1 == null)
+			{
+				throw new DataServiceException(GestorErrors.UNIFY_CLIENT_NOT_FOUND, "Identificador " + clientID1);
+			}
+			
+			if (client2 == null)
+			{
+				throw new DataServiceException(GestorErrors.UNIFY_CLIENT_NOT_FOUND, "Identificador " + clientID2);
+			}
+
+			for(Documento doc : client2.getDocumentos()) {
+				doc.setCliente(client1);
+				documentDao.update(doc);
+			}
+
+			for(Pago p : client2.getPagos()) {
+				p.setPagador(client1);
+				paymentDao.update(p);
+			}			
+			
+			for(Expediente exp : client2.getExpedientes()) {
+				exp.getClientes().add(client1);
+				fileDao.update(exp);
+			}			
+			
+			client2.setExpedientes(null);
+			client2.setPagos(null);
+			client2.setDocumentos(null);
+			
+			client1.setObservaciones(addObs(client1, client2));
+			
+			deleteClient(clientID2);
+			
+			clientDao.update(client1);
+			
+		} catch (DataException e) {
+			throw new DataServiceException(GestorErrors.UNKNOWN_EXCEPTION, e);
+		}		
+	}
+	
+	private String addObs(Cliente client1, Cliente client2) {
+		
+		String obs1 = "";
+		if (client1 != null && client1.getObservaciones() != null) {
+			obs1 = client1.getObservaciones();
+		}
+		
+		String obs2 = "";
+		if (client2 != null && client2.getObservaciones() != null) {
+			obs2 = client2.getObservaciones();
+		}
+		
+		String address2 = "";
+		if (client2 != null && client2.getDireccion() != null) {
+			address2 = client2.getDireccion();
+		}
+		
+		String poblacion2 = "";
+		if (client2 != null && client2.getPoblacion() != null) {
+			address2 = client2.getPoblacion();
+		}				
+		
+		
+		//return obs1 + "\n__ UNIFICACION __\n" + obs2 + "\n" + address2 + "\n" + poblacion2;
+		return obs1 + "\n__ UNIFICACION __\n" + serializedClient(client2);
+	}
+
+	private String serializedClient(Cliente client2) {
+		
+		String result = "";
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+			result = objectMapper.writeValueAsString(client2);
+		}catch(Exception e) {
+			return "ERROR AL MAPEAR";
+		}
+		return result;
+	}
+
+	public List<Integer[]> getDuplicateClients() throws DataServiceException {
+		List<Integer[]> result = new ArrayList<Integer[]>();
+		
+		int first1 = 0;
+		int c1Ind = 0;
+		List<ClientSummaryDTO> c1List = getAllClients(-1, first1, null, "id", false);						
+		while (c1Ind < c1List.size()) {			
+			ClientSummaryDTO client1 = c1List.get(c1Ind);
+			int c2Ind = c1Ind + 1;
+			while (c2Ind < c1List.size()) {					
+				ClientSummaryDTO client2 = c1List.get(c2Ind);
+				if (client2.getDni().equals(client2.getId().toString()) && distance(client1, client2) < 3) {
+					Integer[] pair = {client1.getId(), client2.getId()};
+					result.add(pair);
+				}
+				c2Ind++;
+			}				
+			c1Ind++;
+		}
+		
+		return result;
+	}
+	
+	private int distance(ClientSummaryDTO client1, ClientSummaryDTO client2) {
+		
+		String name1 = client1.getNombre().toLowerCase().replaceAll("\\s+","");
+		String name2 = client2.getNombre().toLowerCase().replaceAll("\\s+","");		
+		String surname1 = client1.getApellidos().toLowerCase().replaceAll("\\s+","");
+		String surname2 = client2.getApellidos().toLowerCase().replaceAll("\\s+","");
+		
+		LevenshteinDistance l = LevenshteinDistance.getDefaultInstance();
+		int i = l.apply(name1 + surname1, name2 + surname2);
+
+		return i;
+	}
+
+	@Override
 	public Integer savePayment(PaymentDTO payment) throws DataServiceException {
 		
 		Integer result;
@@ -562,4 +700,5 @@ public class DataServiceImpl implements IDataService {
 			throw new DataServiceException(GestorErrors.UNKNOWN_EXCEPTION, e);
 		}				 					
 	}
+
 }

@@ -9,9 +9,10 @@
 		<h:outputText value="Expedientes" />
 	</ui:define>
 	<ui:define name="content">
-	    <h:form id="fileListForm">		
+	    <h:form id="fileListForm">	
+	    	<p:focus context="expTabla"/>	
 	    	<p:growl id="msgs" showDetail="true" autoUpdate="true"/>	
-		    <p:dataTable var="expediente" widgetVar="filesTable" id="filesTable" value="#{filesListView.dataModel}" rows="20"
+		    <p:dataTable var="expediente" widgetVar="expTabla" id="expTabla" value="#{filesListView.dataModel}" rows="20"
 		                         paginator="true" paginatorPosition="bottom"
 		                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
 		                         rowsPerPageTemplate="20,50,70"
@@ -96,13 +97,21 @@
 		            <h:outputText value="#{expediente.moroso}" style="#{expediente.moroso gt 0 ? 'color:red;' : 'color:balck;'}">
 		            	<f:convertNumber pattern="#,##0.00 ¤" currencySymbol="€" />
 		            </h:outputText>
+		        </p:column>
+		        
+				<p:column headerText="F. Apertura"
+		        	style="text-align: left; width:100px;"
+		        	filterStyle="width:95%;" sortBy="#{expediente.fechaApertura}">
+		            <h:outputText value="#{expediente.fechaApertura}">
+		            	<f:convertDateTime pattern="dd-MM-yyyy" />
+		            </h:outputText>
 		        </p:column>	        
 		        
 		        <p:column headerText="Estado" sortBy="#{expediente.cerrado}" filterBy="#{expediente.cerrado}"
 		        	style="text-align: left; width:100px;"
 		        	filterStyle="width:95%;">
 					<f:facet name="filter">
-		                <p:selectOneButton onchange="PF('filesTable').filter()">
+		                <p:selectOneButton onchange="PF('expTabla').filter()">
 		                    <f:converter converterId="javax.faces.Boolean" />
 		                    <f:selectItem itemLabel="T" itemValue="" />
 		                    <f:selectItem itemLabel="C" itemValue="true" />
@@ -119,7 +128,7 @@
 		        </p:column>	        	        
 		    </p:dataTable>   
 
-			<p:blockUI block="filesTable" trigger="filesTable">
+			<p:blockUI block="expTabla" trigger="expTabla">
 				LOADING<br />
 				<p:graphicImage name="images/ajax-loader.gif"/>
 			</p:blockUI>
@@ -130,7 +139,7 @@
 			showEffect="clip" modal="true" closable="false" severity="alert">
 			<h:panelGroup layout="block" style="text-align: right">
 				<p:commandButton value="Yes" action="#{filesListView.deleteFile}"
-					oncomplete="PF('deleteDlg').hide();" update=":fileListForm:msgs :fileListForm:filesTable" />
+					oncomplete="PF('deleteDlg').hide();" update=":fileListForm:msgs :fileListForm:expTabla" />
 				<p:commandButton value="No"
 					oncomplete="PF('deleteDlg').hide();" />
 			</h:panelGroup>

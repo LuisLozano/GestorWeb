@@ -11,7 +11,7 @@
 			<p:menuitem value="Expedientes" url="expedientes.xhtml" icon="ui-icon-document"/>
 			<p:menuitem id="clients" value="Clientes" url="clients.xhtml" icon="ui-icon-person"/>
 			<p:menuitem id="responsibles" value="Responsables" url="responsibles.xhtml" icon="ui-icon-star"/>
-			<p:menuitem id="configuration" value="Configuración" url="configuration.xhtml" icon="ui-icon-gear"/>
+			<p:menuitem id="configuration" value="Configuración" url="configuration.xhtml" icon="ui-icon-gear" rendered="#{p:ifGranted('Salazar_admin')}"/>
 		</p:menubar>
 	</h:form>
 </ui:composition>

@@ -2,6 +2,7 @@ package es.salazaryasociados.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -46,6 +47,12 @@ public class Expediente implements Serializable {
 
 	@Column(name="Observaciones")
 	private String observaciones;
+	
+	@Column(name="FApertura")
+	private Date fechaApertura;
+	
+	@Column(name="FCierre")
+	private Date fechaCierre;	
 
 	@Column(name="Presupuesto")
 	private BigDecimal presupuesto = new BigDecimal(0.0);
@@ -170,6 +177,22 @@ public class Expediente implements Serializable {
 
 	public void setEventos(Set<Evento> eventos) {
 		this.eventos = eventos;
+	}
+
+	public Date getFechaApertura() {
+		return fechaApertura;
+	}
+
+	public void setFechaApertura(Date fechaApertura) {
+		this.fechaApertura = fechaApertura;
+	}
+
+	public Date getFechaCierre() {
+		return fechaCierre;
+	}
+
+	public void setFechaCierre(Date fechaCierre) {
+		this.fechaCierre = fechaCierre;
 	}
 
 	@Override

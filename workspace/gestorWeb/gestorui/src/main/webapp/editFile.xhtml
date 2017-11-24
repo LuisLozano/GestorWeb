@@ -8,7 +8,7 @@
 		header="Expediente: #{(editFile.fileDetail.id > 0)? editFile.fileDetail.id : 'nuevo'}"
 		dynamic="true">
 
-		<p:ajax event="close" update="@([id$=filesTable])" />
+		<p:ajax event="close" update="@([id$=expTabla])" />
 		
 		<h:form id="fileForm">				
 			<p:growl id="msgs" showDetail="true" autoUpdate="true"/>	
@@ -58,8 +58,13 @@
 					<h:panelGrid columns="2" cellpadding="10">
 						<h:outputText value="Observaciones" />
 						<p:inputTextarea rows="4" cols="200"
-							value="#{editFile.fileDetail.observaciones}" id="obs" />
-					</h:panelGrid>
+							value="#{editFile.fileDetail.observaciones}" id="obs" />							
+					
+						<p:outputLabel value="Fecha Apertura: "/>							
+						<h:outputText value="#{editFile.fileDetail.fechaApertura}"><f:convertDateTime pattern="dd-MM-yyyy" /></h:outputText>
+						<p:outputLabel value="Fecha Cierre: " />
+						<h:outputText value="#{editFile.fileDetail.fechaCierre}"><f:convertDateTime pattern="dd-MM-yyyy" /></h:outputText>
+					</h:panelGrid>					
 				</p:tab>
 
 				<p:tab id="events" title="Eventos">
@@ -121,8 +126,9 @@
 						<p:column style="width:5%;text-align: center">
 							<p:commandButton action="#{editClient.editAction}"
 								actionListener="#{editClient.attrListener}"
-								oncomplete="PF('clientEdit').show();" icon="ui-icon-search"
-								update=":clientDetailID @([id$=clientsTable])">
+								oncomplete="PF('fileEdit').hide(); PF('clientEdit').show();" icon="ui-icon-search"
+								update=":clientDetailID @([id$=clientsTable])"
+								>
 								<p:resetInput target="clientDetailID" />
 								<f:attribute name="actionButton" value="update" />
 								<f:setPropertyActionListener value="#{cliente}"

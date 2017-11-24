@@ -94,6 +94,12 @@
             <scope>provided</scope>
 		</dependency>       	
 		
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-text</artifactId>
+			<version>1.1</version>
+			<scope>provided</scope>
+		</dependency>		
 		
 		<dependency>
 			<groupId>es.salazaryasociados</groupId>
@@ -146,10 +152,18 @@
 							org.apache.myfaces.view.facelets.impl,	
 							javax.faces.application,
 							javax.inject,	
+							org.keycloak.adapters.jetty,
+							org.keycloak.adapters,
+							org.keycloak.constants,
+							org.keycloak.util,
+							org.keycloak.representations.adapters.config,
+							org.keycloak.*,
+							org.keycloak.adapters.osgi,
+							org.eclipse.jetty.security,
 							org.osgi.framework,							
 							javax.faces.*,
 							javax.annotation.*,
-							org.primefaces.model,
+							org.primefaces.model,							
 							*
 						</Import-Package>
 						<Export-Package>!*</Export-Package>

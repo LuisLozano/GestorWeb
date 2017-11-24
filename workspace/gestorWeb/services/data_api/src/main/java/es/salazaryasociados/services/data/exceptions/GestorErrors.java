@@ -56,7 +56,10 @@ public enum GestorErrors {
 	CONFIGURACION_DAO_NOT_DEFINED("No se ha definido el servicio de acceso a la configuraci�n"), 
 	CONFIGURACION_NOT_EXISTS ("No se pueden crear objetos nuevos de configuraci�n"), 
 	CONFIGURACION_THEME_NOT_EXISTS ("El tema seleccionado no existe"), 
-	LISTADO_EXP_DAO_NOT_DEFINED ("No se ha definido el DAO para listado de expedientes por responsable")
+	LISTADO_EXP_DAO_NOT_DEFINED ("No se ha definido el DAO para listado de expedientes por responsable"),
+	
+	UNIFY_SAME_CLIENT ("No se puede elegir el mismo cliente para una unificación"),
+	UNIFY_CLIENT_NOT_FOUND ("No se ha encontrado el cliente para la unificación")
 	;
 	
 	private String message = "";

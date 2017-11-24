@@ -27,9 +27,10 @@ public interface IDataService {
 	public Integer saveFile(FileDTO file) throws DataServiceException;
 	public void deleteFile(int fileID) throws DataServiceException;
 	
-	public List<String> getSubjects(int pageSize, int first, final Map<String, Object> params, String order, boolean desc) throws DataServiceException;
-	public long getSubjectsCount(final Map<String, Object> params) throws DataServiceException;
-	public void unify(List<String> selectedSubjects, String newSubject) throws DataServiceException;
+	public List<FileSummaryDTO> getFilesGroupBy(int pageSize, int first, final Map<String, Object> params, String order, boolean desc, String groupBy) throws DataServiceException;
+	public long getlFilesCount(Map<String, Object> filters, String groupBy);
+	public List<String> getSubjects(int pageSize, int first, final Map<String, Object> params, String order, boolean desc) throws DataServiceException;	
+	public void unifySubjects(List<String> selectedSubjects, String newSubject) throws DataServiceException;
 	
 	// Eventos
 	public List<EventDTO> getAllEvents(int pageSize, int first, final Map<String, Object> params, String order, boolean desc) throws DataServiceException;
@@ -49,6 +50,8 @@ public interface IDataService {
 	public ClientDTO getClientById(int id, String ... fetch) throws DataServiceException;
 	public Integer saveClient(ClientDTO file) throws DataServiceException;
 	public void deleteClient(int clientID) throws DataServiceException;
+	public void unifyClients(int clientID1, int clientID2) throws DataServiceException;
+	public List<Integer[]> getDuplicateClients() throws DataServiceException;
 	
 	//Pagos
 	public List<PaymentDTO> getAllPayments(int pageSize, int first, final Map<String, Object> params, String order, boolean desc) throws DataServiceException;
@@ -57,6 +60,6 @@ public interface IDataService {
 	
 	//Documentos
 	public Integer saveDocument(DocumentDTO file) throws DataServiceException;
-	public void deleteDocument(int documentID) throws DataServiceException;	
+	public void deleteDocument(int documentID) throws DataServiceException;
 		
 }

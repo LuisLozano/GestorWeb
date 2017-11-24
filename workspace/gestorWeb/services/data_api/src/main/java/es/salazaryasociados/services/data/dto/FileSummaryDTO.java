@@ -1,6 +1,7 @@
 package es.salazaryasociados.services.data.dto;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 import lombok.Data;
 
@@ -15,4 +16,6 @@ public class FileSummaryDTO {
 	private BigDecimal pagado = new BigDecimal(0.0);
 	private String responsable;	
 	private BigDecimal moroso = new BigDecimal(0.0);
+	private Date fechaApertura;
+	private Date fechaCierre;			
 }

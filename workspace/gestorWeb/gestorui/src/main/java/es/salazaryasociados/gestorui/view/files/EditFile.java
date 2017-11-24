@@ -26,7 +26,6 @@ import javax.faces.event.ActionEvent;
 import javax.inject.Inject;
 
 import org.omg.CORBA.UserException;
-import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.ScheduleEntryMoveEvent;
 import org.primefaces.event.ScheduleEntryResizeEvent;
@@ -342,13 +341,11 @@ public class EditFile extends SalazarBean {
 	}
 
 	public void onEventMove(ScheduleEntryMoveEvent event) {
-		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Event moved",
-				"Day delta:" + event.getDayDelta() + ", Minute delta:" + event.getMinuteDelta());
+		logger.debug("Llamada a onEventMove");
 	}
 
 	public void onEventResize(ScheduleEntryResizeEvent event) {
-		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Event resized",
-				"Day delta:" + event.getDayDelta() + ", Minute delta:" + event.getMinuteDelta());
+		logger.debug("Llamada a onEventResize");
 	}	
 	
 	public void onTimelineEventSelect(TimelineSelectEvent e) {  
@@ -360,11 +357,16 @@ public class EditFile extends SalazarBean {
 	
 	private void save() {
 
-		RequestContext requestContext = RequestContext.getCurrentInstance();
 		try {
-			if (fileDetail.getClients() != null && fileDetail.getClients().size() > 0)
+			if (fileDetail.getClients() != null && fileDetail.getClients().size() > 0) {
+				
+				if (fileDetail.getFechaCierre() == null && fileDetail.getCerrado().booleanValue())
+					fileDetail.setFechaCierre(new Date());
+				else if (fileDetail.getFechaCierre() != null && !fileDetail.getCerrado().booleanValue())
+					fileDetail.setFechaCierre(null);
+				
 				dataService.saveFile(fileDetail);
-			else
+			} else
 				throw new DataServiceException(GestorErrors.FILE_HAS_NO_CLIENTS, "No hay clientes en el expediente");
 		} catch (Exception e) {
 			FacesContext context = FacesContext.getCurrentInstance();

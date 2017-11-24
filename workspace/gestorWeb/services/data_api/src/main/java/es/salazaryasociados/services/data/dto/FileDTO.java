@@ -1,6 +1,7 @@
 package es.salazaryasociados.services.data.dto;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -13,6 +14,8 @@ public class FileDTO {
 	private String asunto;
 	private Boolean cerrado = new Boolean(false);
 	private String observaciones;
+	private Date fechaApertura;
+	private Date fechaCierre;		
 	private BigDecimal presupuesto = new BigDecimal(0.0);
 	private Set<PaymentSummaryDTO> payments = new HashSet<PaymentSummaryDTO>();
 	private Set<EventDTO> events = new HashSet<EventDTO>();
@@ -20,5 +23,4 @@ public class FileDTO {
 	private Set<ClientSummaryDTO> clients = new HashSet<ClientSummaryDTO>();
 	private ResponsibleDTO responsible1;
 	private ResponsibleDTO responsible2;
-
 }
