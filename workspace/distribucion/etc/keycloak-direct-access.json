@@ -1,0 +1,7 @@
+{
+  "realm": "SalazarRealm",
+  "auth-server-url": "http://localhost:8080/auth",
+  "ssl-required": "none",
+  "resource": "ssh-jmx-admin-client",
+  "public-client": true
+}

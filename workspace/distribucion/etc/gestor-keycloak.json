@@ -1,0 +1,7 @@
+{
+  "realm": "SalazarRealm",
+  "auth-server-url": "http://localhost:8080/auth",
+  "ssl-required": "external",
+  "resource": "salazar_gestor",
+  "public-client": true
+}
